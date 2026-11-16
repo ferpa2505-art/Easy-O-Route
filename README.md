@@ -6,6 +6,8 @@
 [![GitHub license](https://img.shields.io/github/license/ferpa2505-art/Easy-O-Route)](https://github.com/ferpa2505-art/Easy-O-Route/blob/main/LICENSE)
 [![GitHub issues](https://img.shields.io/github/issues/ferpa2505-art/Easy-O-Route)](https://github.com/ferpa2505-art/Easy-O-Route/issues)
 [![npm version](https://img.shields.io/npm/v/easy-o-route?label=npm)](https://www.npmjs.com/package/easy-o-route)
+[![npm downloads](https://img.shields.io/npm/dw/easy-o-route)](https://www.npmjs.com/package/easy-o-route)
+[![npm total downloads](https://img.shields.io/npm/dt/easy-o-route)](https://www.npmjs.com/package/easy-o-route)
 
 ---
 
@@ -14,6 +16,17 @@
 **Easy-O-Route** é uma **CLI (Command Line Interface) + Scripts Bash** que **simplifica drasticamente** a configuração, gerenciamento e uso do **[OmniRoute](https://github.com/cheaper-inference/OmniRoute)** - o roteador de IA que permite usar **múltiplos provedores de IA** (Mistral, Groq, Google, NVIDIA, etc.) de forma **econômica e eficiente**.
 
 Baseado no guia prático **["IA BARATA de Verdade"](https://github.com/ferpa2505-art/Easy-O-Route/docs)** - um ebook completo que ensina a instalar, configurar e medir economias com o OmniRoute.
+
+---
+
+## ✅ **Status do Projeto**
+
+| Item | Status | Link |
+|------|--------|------|
+| **npm** | ✅ Publicado | [npmjs.com/package/easy-o-route](https://www.npmjs.com/package/easy-o-route) |
+| **GitHub** | ✅ Publicado | [github.com/ferpa2505-art/Easy-O-Route](https://github.com/ferpa2505-art/Easy-O-Route) |
+| **Release** | ✅ v1.0.0 | [Releases](https://github.com/ferpa2505-art/Easy-O-Route/releases) |
+| **Documentação** | ✅ Completa | [docs/](docs/) |
 
 ---
 
@@ -46,6 +59,13 @@ npm install -g easy-o-route
 
 # Verificar versão
 easy-o-route --version
+```
+
+### **Opção 2: Instalação Direta do GitHub**
+
+```bash
+# Clonar e instalar
+npm install -g https://github.com/ferpa2505-art/Easy-O-Route.git
 ```
 
 ### **Opção 2: Instalação Local (Para desenvolvimento)**
