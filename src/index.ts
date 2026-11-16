@@ -6,6 +6,7 @@ import figlet from 'figlet';
 import { setupCommand } from './commands/setup';
 import { statusCommand } from './commands/status';
 import { versionCommand } from './commands/version';
+import { checkCommand } from './commands/check';
 import { logError } from './utils/logger';
 
 // Display banner
@@ -36,6 +37,7 @@ export const main = () => {
   program.addCommand(setupCommand);
   program.addCommand(statusCommand);
   program.addCommand(versionCommand);
+  program.addCommand(checkCommand);
 
   // Help command
   program
