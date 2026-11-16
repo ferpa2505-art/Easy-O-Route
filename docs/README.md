@@ -62,7 +62,7 @@ Este diretório contém toda a documentação do **Easy-O-Route**, organizada em
 ## 📊 **Dados do Autor (Referência)**
 
 ### **Configuração do Autor (Oct/2026)**
-- **OmniRoute**: 3.8.52
+- **OmniRoute**: 3.8.53
 - **Sistema**: Windows
 - **Node.js**: v24.15.0
 - **npm**: 11.12.1

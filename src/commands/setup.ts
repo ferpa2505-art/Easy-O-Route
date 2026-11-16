@@ -43,7 +43,7 @@ export const setupCommand = new Command('setup')
         try {
           const checkOmniRoute = execSync('omniroute --version 2>&1').toString().trim();
           
-          if (checkOmniRoute.includes('3.8.52') && !options.force) {
+          if (checkOmniRoute.includes('3.8.53') && !options.force) {
             logInfo(`✅ OmniRoute já está instalado (versão: ${checkOmniRoute})`);
           } else {
             logInfo('📦 Instalando OmniRoute...');

@@ -281,7 +281,7 @@ easy-o-route validate
 ## 📊 **MÉTRICAS DO AUTOR (Referência do Ebook)**
 
 ### **Configuração do Autor (Oct/2026)**
-- **OmniRoute**: 3.8.52
+- **OmniRoute**: 3.8.53
 - **Sistema**: Windows
 - **Node.js**: v24.15.0
 - **npm**: 11.12.1

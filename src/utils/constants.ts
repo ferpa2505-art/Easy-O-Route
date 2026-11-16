@@ -1,7 +1,7 @@
 // OmniRoute constants
 export const OMNIROUTE = {
   NAME: 'OmniRoute',
-  VERSION: '3.8.52',
+  VERSION: '3.8.53',
   URL: 'https://github.com/cheaper-inference/OmniRoute',
   LOCAL_URL: 'http://localhost:20128',
   API_BASE: 'http://localhost:20128/v1',
