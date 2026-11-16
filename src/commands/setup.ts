@@ -1,6 +1,4 @@
 import { Command } from 'commander';
-import chalk from 'chalk';
-import inquirer from 'inquirer';
 import { execSync } from 'child_process';
 import {
   logInfo,
@@ -11,10 +9,7 @@ import {
   logSection,
   logItem,
 } from '../utils/logger';
-import { readConfig, writeConfig, getConfigDir } from '../utils/config';
-import { OMNIROUTE } from '../utils/constants';
 
-// Setup command
 export const setupCommand = new Command('setup')
   .description('Configuração inicial do OmniRoute')
   .option('-f, --force', 'Forçar reinstalação')
@@ -36,7 +31,7 @@ export const setupCommand = new Command('setup')
         if (!nodeVersion.startsWith('v24') && !nodeVersion.startsWith('v22')) {
           logWarn('⚠️ Recomendado: Node.js 22.x ou 24.x');
         }
-      } catch (error) {
+      } catch (error: any) {
         logError('❌ Node.js não encontrado. Instale o Node.js em: https://nodejs.org');
         return;
       }
@@ -48,16 +43,15 @@ export const setupCommand = new Command('setup')
         try {
           const checkOmniRoute = execSync('omniroute --version 2>&1').toString().trim();
           
-          if (checkOmniRoute.includes(OMNIROUTE.VERSION) && !options.force) {
-            logInfo(`✅ OmniRoute já está instalado (versão: ${OMNIROUTE.VERSION})`);
+          if (checkOmniRoute.includes('3.8.52') && !options.force) {
+            logInfo(`✅ OmniRoute já está instalado (versão: ${checkOmniRoute})`);
           } else {
             logInfo('📦 Instalando OmniRoute...');
             
             try {
               execSync('npm install -g omniroute --force 2>&1', { stdio: 'inherit' });
               logSuccess('✅ OmniRoute instalado com sucesso!');
-            } catch (installError) {
-              // Try with allow-scripts for npm 11+
+            } catch (installError: any) {
               logInfo('🔄 Tentando com --allow-scripts...');
               execSync(
                 'npm install -g omniroute --allow-scripts=omniroute,keytar,onnxruntime-node,@parcel/watcher,@swc/core,protobufjs,esbuild --force 2>&1',
@@ -72,7 +66,7 @@ export const setupCommand = new Command('setup')
           try {
             execSync('npm install -g omniroute --force 2>&1', { stdio: 'inherit' });
             logSuccess('✅ OmniRoute instalado com sucesso!');
-          } catch (installError) {
+          } catch (installError: any) {
             logError('❌ Falha ao instalar OmniRoute');
             logError(installError.message);
             return;
@@ -90,46 +84,20 @@ export const setupCommand = new Command('setup')
         return;
       }
 
-      // Step 4: Start OmniRoute
-      logSection('4. Iniciando OmniRoute');
-      
-      const answers = await inquirer.prompt([
-        {
-          type: 'confirm',
-          name: 'startNow',
-          message: 'Deseja iniciar o OmniRoute agora?',
-          default: true,
-        },
-      ]);
-
-      if (answers.startNow) {
-        logInfo('🚀 Iniciando OmniRoute...');
-        logInfo('Aguarde... O OmniRoute será iniciado em uma nova janela.');
-        logInfo('');
-        logInfo('Para acessar o painel, abra: http://localhost:20128');
-        logInfo('');
-        logInfo('Senha padrão: CHANGEME');
-        logInfo('');
-        logWarn('⚠️  TROQUE A SENHA no primeiro acesso!');
-        
-        // Don't start here, let user do it manually
-        // execSync('omniroute &', { stdio: 'ignore' });
-      }
-
-      // Step 5: Configure autostart
+      // Step 4: Configure autostart
       if (options.autostart) {
-        logSection('5. Configurando Início Automático');
+        logSection('4. Configurando Início Automático');
         
         try {
           execSync('omniroute autostart enable');
           logSuccess('✅ Início automático configurado!');
-        } catch (error) {
+        } catch (error: any) {
           logWarn('⚠️ Não foi possível configurar início automático');
           logInfo('Tente manualmente: omniroute autostart enable');
         }
       }
 
-      // Step 6: Configuration summary
+      // Step 5: Summary
       logSection('✅ Configuração Concluída');
       
       logInfo('');
@@ -138,7 +106,6 @@ export const setupCommand = new Command('setup')
       logItem('Node.js', 'Instalado');
       logItem('OmniRoute', 'Instalado');
       logItem('Painel', 'http://localhost:20128');
-      logItem('Senha padrão', 'CHANGEME');
       logInfo('');
       
       logSuccess('✅ Configuração inicial concluída!');
@@ -148,9 +115,8 @@ export const setupCommand = new Command('setup')
       logInfo('2. Acesse: http://localhost:20128');
       logInfo('3. Troque a senha padrão');
       logInfo('4. Conecte seus provedores');
-      logInfo('5. Crie seus combos');
       
-    } catch (error) {
+    } catch (error: any) {
       logError(`❌ Erro durante a configuração: ${error.message}`);
       process.exit(1);
     }

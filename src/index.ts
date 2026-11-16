@@ -4,14 +4,9 @@ import { program } from 'commander';
 import chalk from 'chalk';
 import figlet from 'figlet';
 import { setupCommand } from './commands/setup';
-import { apiCommand } from './commands/api';
-import { providerCommand } from './commands/provider';
-import { comboCommand } from './commands/combo';
-import { backupCommand } from './commands/backup';
-import { validateCommand } from './commands/validate';
 import { statusCommand } from './commands/status';
 import { versionCommand } from './commands/version';
-import { logError, logInfo, logSuccess, logWarn } from './utils/logger';
+import { logError } from './utils/logger';
 
 // Display banner
 const displayBanner = () => {
@@ -39,11 +34,6 @@ export const main = () => {
 
   // Register commands
   program.addCommand(setupCommand);
-  program.addCommand(apiCommand);
-  program.addCommand(providerCommand);
-  program.addCommand(comboCommand);
-  program.addCommand(backupCommand);
-  program.addCommand(validateCommand);
   program.addCommand(statusCommand);
   program.addCommand(versionCommand);
 

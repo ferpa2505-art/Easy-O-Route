@@ -1,5 +1,4 @@
 import { Command } from 'commander';
-import chalk from 'chalk';
 import { execSync } from 'child_process';
 import {
   logInfo,
@@ -8,15 +7,12 @@ import {
   logTitle,
   logSection,
   logItem,
-  logTable,
 } from '../utils/logger';
-import { OMNIROUTE } from '../utils/constants';
 
-// Status command
 export const statusCommand = new Command('status')
   .description('Status do OmniRoute')
   .option('-v, --verbose', 'Exibir informações detalhadas')
-  .action(async (options) => {
+  .action(async () => {
     try {
       logTitle('📊 Status do OmniRoute');
 
@@ -24,7 +20,6 @@ export const statusCommand = new Command('status')
       logSection('1. Verificando se o OmniRoute está rodando');
       
       try {
-        // Try to get version (this will fail if not running)
         execSync('curl -s http://localhost:20128/v1/models -H "Authorization: Bearer CHANGEME" 2>&1', { stdio: 'pipe' });
         logSuccess('✅ OmniRoute está rodando!');
         logItem('URL', 'http://localhost:20128');
@@ -59,13 +54,11 @@ export const statusCommand = new Command('status')
         const npmVersion = execSync('npm --version').toString().trim();
         const osPlatform = process.platform;
         const osArch = process.arch;
-        const memory = (process.memoryUsage().heapTotal / 1024 / 1024).toFixed(2);
         
         logItem('Node.js', nodeVersion);
         logItem('npm', npmVersion);
         logItem('Sistema', `${osPlatform} (${osArch})`);
-        logItem('Memória disponível', `${memory} MB`);
-      } catch (error) {
+      } catch (error: any) {
         logError(`❌ Erro ao verificar ambiente: ${error.message}`);
       }
 
@@ -74,16 +67,15 @@ export const statusCommand = new Command('status')
       try {
         const doctorOutput = execSync('omniroute doctor').toString();
         logInfo('');
-        logInfo(chalk.cyan('--- Output do omniroute doctor ---'));
         console.log(doctorOutput);
-        logInfo(chalk.cyan('----------------------------------'));
-      } catch (error) {
+        logInfo('');
+      } catch (error: any) {
         logError('❌ não foi possível executar omniroute doctor');
       }
 
       logSection('✅ Status Verificado');
       
-    } catch (error) {
+    } catch (error: any) {
       logError(`❌ Erro ao verificar status: ${error.message}`);
       process.exit(1);
     }
