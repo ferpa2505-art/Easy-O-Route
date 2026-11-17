@@ -171,9 +171,7 @@ Você vai criar **seus próprios combos** no Capítulo 07.
 
 ## 🔗 Próximo Capítulo
 
-👉 **[Capítulo 06: Conectando Provedores →](CAPITULO-06-CONECTANDO-PROVEDORES.md)**
-
-*Aprenda a conectar provedores e criar suas chaves de API!*
+👉 **Capítulo 06 (Conectando Provedores) ainda não foi escrito.** Enquanto isso, use `easy-o-route providers --setup-guide`.
 
 ---
 

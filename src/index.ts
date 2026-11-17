@@ -7,7 +7,9 @@ import { setupCommand } from './commands/setup';
 import { statusCommand } from './commands/status';
 import { versionCommand } from './commands/version';
 import { checkCommand } from './commands/check';
+import { providersCommand } from './commands/providers';
 import { logError } from './utils/logger';
+import { EASY_OROUTE } from './utils/constants';
 
 // Display banner
 const displayBanner = () => {
@@ -25,7 +27,7 @@ export const main = () => {
   program
     .name('easy-o-route')
     .description('Facilitador de Configuracao do OmniRoute - CLI para gerenciar provedores, combos e chaves API')
-    .version('1.0.0', '-v, --version', 'Output the current version')
+    .version(EASY_OROUTE.VERSION, '-v, --version', 'Output the current version')
     .option('-d, --debug', 'Enable debug mode')
     .hook('preAction', (thisCommand) => {
       if (thisCommand.opts().debug) {
@@ -38,6 +40,7 @@ export const main = () => {
   program.addCommand(statusCommand);
   program.addCommand(versionCommand);
   program.addCommand(checkCommand);
+  program.addCommand(providersCommand);
 
   // Help command
   program

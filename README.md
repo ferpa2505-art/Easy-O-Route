@@ -1,322 +1,265 @@
 # Easy-O-Route
 
-> **✨ O Facilitador Definitivo para Configuração do OmniRoute**
+> **A friendly setup helper for [OmniRoute](https://github.com/cheaper-inference/OmniRoute): route your AI requests through free providers first and paid ones last.**
 
 [![GitHub stars](https://img.shields.io/github/stars/ferpa2505-art/Easy-O-Route?style=social)](https://github.com/ferpa2505-art/Easy-O-Route/stargazers)
 [![GitHub license](https://img.shields.io/github/license/ferpa2505-art/Easy-O-Route)](https://github.com/ferpa2505-art/Easy-O-Route/blob/main/LICENSE)
 [![GitHub issues](https://img.shields.io/github/issues/ferpa2505-art/Easy-O-Route)](https://github.com/ferpa2505-art/Easy-O-Route/issues)
 [![npm version](https://img.shields.io/npm/v/easy-o-route?label=npm)](https://www.npmjs.com/package/easy-o-route)
 [![npm downloads](https://img.shields.io/npm/dw/easy-o-route)](https://www.npmjs.com/package/easy-o-route)
-[![npm total downloads](https://img.shields.io/npm/dt/easy-o-route)](https://www.npmjs.com/package/easy-o-route)
 
 ---
 
-## 🎯 **O que é o Easy-O-Route?**
+## What is Easy-O-Route?
 
-**Easy-O-Route** é uma **CLI (Command Line Interface) + Scripts Bash** que **simplifica drasticamente** a configuração, gerenciamento e uso do **[OmniRoute](https://github.com/cheaper-inference/OmniRoute)** - o roteador de IA que permite usar **múltiplos provedores de IA** (Mistral, Groq, Google, NVIDIA, etc.) de forma **econômica e eficiente**.
+**Easy-O-Route** is a command-line tool (CLI) and a set of Bash scripts that make it easier to install, configure and check [OmniRoute](https://github.com/cheaper-inference/OmniRoute), an AI gateway that lets you use several AI providers (Mistral, Groq, Google, NVIDIA, OpenRouter, and others) through one local endpoint.
 
-Baseado no guia prático **["IA BARATA de Verdade"](https://github.com/ferpa2505-art/Easy-O-Route/docs)** - um ebook completo que ensina a instalar, configurar e medir economias com o OmniRoute.
+The idea is simple: put **free providers first** in your fallback queue (a *combo*) and paid providers last, so you only pay when everything else fails.
 
----
-
-## ✅ **Status do Projeto**
-
-| Item | Status | Link |
-|------|--------|------|
-| **npm** | ✅ Publicado | [npmjs.com/package/easy-o-route](https://www.npmjs.com/package/easy-o-route) |
-| **GitHub** | ✅ Publicado | [github.com/ferpa2505-art/Easy-O-Route](https://github.com/ferpa2505-art/Easy-O-Route) |
-| **Release** | ✅ v1.0.0 | [Releases](https://github.com/ferpa2505-art/Easy-O-Route/releases) |
-| **Documentação** | ✅ Completa | [docs/](docs/) |
+> The project is based on the Portuguese guide *"IA BARATA de Verdade"* (see [`docs/`](docs/)). The documentation is currently written in Portuguese.
 
 ---
 
-## ⚡ **Por que usar o Easy-O-Route?**
+## Why use it?
 
-### **💰 Economize até 89% nos custos com IA**
-- Coloque **IAs gratuitas na frente da fila** e as pagas por último
-- O dinheiro só sai quando todo o resto falha
-- **Medido em uso real**: US$ 113,58 → US$ 12,09 (economia de **89%**)
-
-### **⚡ Otimize seu fluxo de trabalho**
-- **Sem precisar saber programar** - comandos simples e diretos
-- **Configuração em minutos** - não em horas
-- **Gerenciamento centralizado** - todas as suas chaves e provedores em um lugar
-
-### **🛡️ Segurança e Controle**
-- **Chaves criptografadas** no seu computador
-- **Nunca compartilhe chaves** em chats ou grupos
-- **Controle total** sobre quais provedores são usados
+- **Lower AI costs.** Free providers are tried first. The author reports an 89% cost reduction in their own usage (see [Author's reported results](#authors-reported-results)).
+- **No deep technical knowledge required.** Short commands with clear output.
+- **Local and under your control.** OmniRoute runs on your machine (`http://localhost:20128`), and you choose which providers are used.
+- **Checks your setup.** `check` verifies your installation and suggests fixes.
 
 ---
 
-## 📦 **Instalação**
+## Requirements
 
-### **Opção 1: Instalação Global (Recomendado)**
+- **Node.js 18 or newer** (for the CLI)
+- **OmniRoute** installed (`easy-o-route setup` can install it for you)
+- API keys from the providers you want to use (keep them in a password manager)
+
+---
+
+## Installation
+
+### Option 1: Global install from npm (recommended)
 
 ```bash
-# Instalar o Easy-O-Route globalmente
 npm install -g easy-o-route
 
-# Verificar versão
+# Check the installed version
 easy-o-route --version
 ```
 
-### **Opção 2: Instalação Direta do GitHub**
+### Option 2: Install directly from GitHub
 
 ```bash
-# Clonar e instalar
 npm install -g https://github.com/ferpa2505-art/Easy-O-Route.git
 ```
 
-### **Opção 2: Instalação Local (Para desenvolvimento)**
+### Option 3: Local development setup
 
 ```bash
-# Clonar o repositório
 git clone https://github.com/ferpa2505-art/Easy-O-Route.git
 cd Easy-O-Route
 
-# Instalar dependências
 npm install
+npm run build
 
-# Link global (opcional)
+# Run the compiled CLI
+node dist/index.js --help
+
+# Optional: make the `easy-o-route` command available globally from this folder
 npm link
-
-# Rodar normalmente
-node dist/index.js
 ```
 
-### **Opção 3: Usar Scripts Bash (Sem Node.js)**
+### Option 4: Bash scripts only (no Node.js CLI)
 
 ```bash
-# Baixar scripts
 curl -L https://raw.githubusercontent.com/ferpa2505-art/Easy-O-Route/main/scripts/setup.sh -o setup.sh
 chmod +x setup.sh
-
-# Executar setup
 ./setup.sh
 ```
 
 ---
 
-## 🚀 **Guia Rápido de Uso**
-
-### **1️⃣ Configuração Inicial**
+## Quick start
 
 ```bash
-# Setup completo (instala OmniRoute + configura)
+# 1. Install and configure OmniRoute
 easy-o-route setup
 
-# Ou use o script Bash
-./scripts/setup.sh
-```
+# 2. Check that everything is working
+easy-o-route check
 
-### **2️⃣ Gerenciar Provedores**
-
-```bash
-# Listar todos os provedores
-easy-o-route provider list
-
-# Testar conexão com um provedor
-easy-o-route provider test mistral
-
-# Adicionar novo provedor (interativo)
-easy-o-route provider add
-
-# Ver informações de um provedor
-easy-o-route provider info mistral
-```
-
-### **3️⃣ Gerenciar Chaves API**
-
-```bash
-# Adicionar chave API para um provedor
-easy-o-route api add --provider mistral --key SUA_CHAVE
-
-# Listar todas as chaves
-easy-o-route api list
-
-# Remover uma chave
-easy-o-route api remove --provider mistral
-```
-
-### **4️⃣ Criar e Gerenciar Combos**
-
-```bash
-# Criar um novo combo
-easy-o-route combo create economico --strategy priority --models "mistral/codestral-latest,nvidia/llama-3.2-90b,groq/llama-3.1-70b"
-
-# Listar todos os combos
-easy-o-route combo list
-
-# Usar um combo
-easy-o-route combo use economico
-
-# Deletar um combo
-easy-o-route combo delete economico
-```
-
-### **5️⃣ Backup e Restauração**
-
-```bash
-# Criar backup das configurações
-easy-o-route backup create
-
-# Listar backups
-easy-o-route backup list
-
-# Restaurar backup
-easy-o-route backup restore
-
-# Deletar backup
-easy-o-route backup delete
-```
-
-### **6️⃣ Validar e Monitorar**
-
-```bash
-# Validar configuração atual
-easy-o-route validate
-
-# Ver status do OmniRoute
-easy-o-route status
-
-# Ver versão
-easy-o-route version
+# 3. See which free providers are available and how to add them
+easy-o-route providers --recommended
+easy-o-route providers --setup-guide
 ```
 
 ---
 
-## 📖 **Documentação Completa**
-
-### **📚 Guia do Usuário (Baseado no Ebook "IA BARATA de Verdade")**
-
-| Capítulo | Descrição | Link |
-|----------|-----------|------|
-| **Capítulo 01** | Por que a IA fica cara (tokens, preços, desperdício) | [Ler](docs/CAPITULO-01-POR-QUE-A-IA-FICA-CARA.md) |
-| **Capítulo 02** | O que é o OmniRoute (central de IAs, combos) | [Ler](docs/CAPITULO-02-O-QUE-E-O-OMNIROUTE.md) |
-| **Capítulo 03** | Antes de começar (requisitos, segurança) | [Ler](docs/CAPITULO-03-ANTES-DE-COMECAR.md) |
-| **Capítulo 04** | Instalando o OmniRoute (Windows, Mac, Linux) | [Ler](docs/CAPITULO-04-INSTALANDO-O-OMNIROUTE.md) |
-| **Capítulo 05** | Primeiro acesso ao painel | [Ler](docs/CAPITULO-05-PRIMEIRO-ACESSO-AO-PAINEL.md) |
-| **Capítulo 06** | Conectando provedores (Mistral, Groq, etc.) | [Ler](docs/CAPITULO-06-CONECTANDO-PROVEDORES.md) |
-| **Capítulo 07** | Combos: a fila de reserva | [Ler](docs/CAPITULO-07-COMBOS-A-FILA-DE-RESERVA.md) |
-| **Capítulo 08** | Ligando suas ferramentas (Claude Code, etc.) | [Ler](docs/CAPITULO-08-LIGANDO-SUAS-FERRAMENTAS.md) |
-| **Capítulo 09** | Medindo o uso (tokens, custos, cotas) | [Ler](docs/CAPITULO-09-MEDINDO-O-USO.md) |
-| **Capítulo 10** | Quanto você economizou (método de cálculo) | [Ler](docs/CAPITULO-10-QUANTO-VOCE-ECONOMIZOU.md) |
-| **Capítulo 11** | Limites e armadilhas | [Ler](docs/CAPITULO-11-LIMITES-E-ARMADILHAS.md) |
-| **Capítulo 12** | Problemas e soluções | [Ler](docs/CAPITULO-12-PROBLEMAS-E-SOLUCOES.md) |
-| **Capítulo 13** | Checklist, glossário e próximos passos | [Ler](docs/CAPITULO-13-CHECKLIST-GLOSSARIO.md) |
-
-### **🎓 Tutoriais Práticos**
-
-- **[Guia Rápido de Instalação](docs/GUIA-RAPIDO.md)** - Instale em 5 minutos
-- **[Guia de Configuração](docs/INSTALACAO.md)** - Configuração passo a passo
-- **[Exemplos de Combos](docs/EXEMPLOS-COMBOS.md)** - Combos prontos para usar
-- **[Segurança](docs/SEGURANCA.md)** - Melhores práticas de segurança
-
----
-
-## 🎨 **Exemplo de Combo (Fila de Reserva)**
-
-```yaml
-# Combo "economico" - Gratuitos na frente, pagos por último
-combo: economico
-strategy: priority
-models:
-  # 🟢 Gratuitos - Grande capacidade
-  - mistral/codestral-latest        # 95% de acerto
-  - nvidia/llama-3.2-90b            # 81% de acerto
-  - google/gemini-1.5-flash        # Bom para textos longos
-  
-  # 🟡 Gratuitos - Reserva
-  - openrouter/mistralai/mistral-7b-instruct
-  - groq/llama-3.1-70b              # 10% de acerto (recusa pedidos grandes)
-  - cloudflare/llama-3.1-8b
-  
-  # 🔴 Pagos - Última reserva (com teto de gasto)
-  - deepseek/deepseek-chat          # US$ 0,0005/token
-  - anthropic/claude-haiku-5.5     # US$ 0,25/1M tokens (até 100k)
-```
-
-**Resultado médio do autor:**
-- **Taxa de sucesso:** 68% (com combo)
-- **Latência média:** ~10 segundos
-- **Economia:** 89% (US$ 113,58 → US$ 12,09)
-
----
-
-## 📊 **Métricas do Autor (Oct/2026)**
-
-| Métrica | Valor | Observação |
-|---------|-------|------------|
-| **Tokens de entrada** | 260,7 milhões | - |
-| **Tokens de saída** | 1,3 milhão | - |
-| **Solicitações** | 6.623 | - |
-| **Modelos usados** | 181 | - |
-| **Taxa de acerto** | 68% | Com combo |
-| **Custo de tabela** | US$ 63,07 | Preço de lista |
-| **Custo real** | US$ 0,00 | Provedores gratuitos |
-| **Economia** | **89%** | vs. US$ 113,58 anterior |
-
----
-
-## 🛠️ **Comandos CLI Disponíveis**
+## Commands
 
 ```
 Usage: easy-o-route [options] [command]
 
 Commands:
-  setup           Configuração inicial do OmniRoute
-  api             Gerenciar chaves API
-  provider        Gerenciar provedores
-  combo           Gerenciar combos
-  backup          Gerenciar backups
-  validate        Validar configuração
-  status          Status do OmniRoute
-  version         Versão do Easy-O-Route
-  help [cmd]      Help
+  setup       Initial OmniRoute setup
+  status      Show OmniRoute status
+  check       Check the OmniRoute setup and suggest improvements
+  providers   List, check and suggest AI providers (free and paid)
+  version     Show the Easy-O-Route version
+  help        Display help
 
 Options:
   -v, --version   Output the current version
-  -h, --help      Display help for command
+  -d, --debug     Enable debug mode
+  -h, --help      Display help for a command
+```
+
+### `setup`
+
+```bash
+easy-o-route setup                   # Full setup
+easy-o-route setup --skip-omniroute  # Configure without installing OmniRoute
+easy-o-route setup --force           # Reinstall
+easy-o-route setup --autostart       # Start OmniRoute automatically
+```
+
+### `status`
+
+```bash
+easy-o-route status
+easy-o-route status --verbose
+```
+
+### `check`
+
+```bash
+easy-o-route check           # Run all checks (installation, running service, Node.js, etc.)
+easy-o-route check --verbose # More details
+easy-o-route check --fix     # Try to fix issues automatically
+```
+
+### `providers`
+
+```bash
+easy-o-route providers                 # List providers
+easy-o-route providers --free-only     # Only free providers
+easy-o-route providers --recommended   # Recommended providers
+easy-o-route providers --list-all      # All known providers
+easy-o-route providers --setup-guide   # Quick setup guide, including a suggested "economico" combo
+easy-o-route providers --check         # Check connected providers and suggest improvements
+easy-o-route providers --add groq      # Instructions for adding one provider
 ```
 
 ---
 
-## 🤝 **Contribuindo**
+## Example combo (fallback queue)
 
-1. **Fork** o repositório
-2. **Clone** o fork: `git clone https://github.com/YOUR_USERNAME/Easy-O-Route.git`
-3. **Crie uma branch**: `git checkout -b feature/nova-funcionalidade`
-4. **Faça commit**: `git commit -m 'Adiciona nova funcionalidade'`
-5. **Push**: `git push origin feature/nova-funcionalidade`
-6. **Abra um Pull Request**
+The CLI suggests an "economico" combo that uses free providers. You can create it in the OmniRoute dashboard at `http://localhost:20128` (Combos → New combo):
 
----
+```yaml
+combo: economico
+description: Free providers for token savings
+providers:
+  - groq:       [llama-3.1-8b-instant, mixtral-8x7b-instruct-v0.1]
+  - mistral:    [mistral-tiny, mistral-small]
+  - openrouter: [openai/gpt-3.5-turbo, anthropic/claude-3-haiku]
+  - together:   [meta-llama/Llama-3.1-8B-Instruct]
+```
 
-## 📜 **Licença**
-
-Este projeto é licenciado sob a **MIT License** - veja [LICENSE](LICENSE) para detalhes.
-
----
-
-## 🙏 **Agradecimentos**
-
-- **[OmniRoute](https://github.com/cheaper-inference/OmniRoute)** - O roteador de IA incrível
-- **[Fernando Paulino](https://github.com/ferpa2505-art)** - Autor do ebook "IA BARATA de Verdade"
-- **Comunidade de IA Open Source** - Por tornarem a IA acessível a todos
+Model names and free-tier limits change often. Always check each provider's current documentation.
 
 ---
 
-## 📞 **Suporte**
+## Security
 
-- **Documentação**: [docs/](docs/)
-- **Issues**: [GitHub Issues](https://github.com/ferpa2505-art/Easy-O-Route/issues)
-- **Discussões**: [GitHub Discussions](https://github.com/ferpa2505-art/Easy-O-Route/discussions)
-- **Ebook Original**: [IA BARATA de Verdade](docs/README.md)
+- **Never share API keys** in chats, issues, pull requests or screenshots.
+- **Never commit keys** to Git. Use environment variables or a password manager.
+- **Change the default OmniRoute password** (`CHANGEME`) on first access.
+- **Use only official API keys.** Avoid "web" providers that rely on browser cookies.
+- **Do not send sensitive data to free providers.** Check each provider's terms and data policy.
+
+To report a vulnerability, please read [SECURITY.md](SECURITY.md) and do not open a public issue.
+
+---
+
+## Documentation
+
+The guides are currently in Portuguese:
+
+- [Documentation index](docs/README.md)
+- [Quick guide](docs/GUIA-RAPIDO.md)
+- [Installation guide](docs/INSTALACAO.md)
+- Chapters 01–05 (concepts, OmniRoute, installation, first access) in [`docs/`](docs/)
+
+---
+
+## Project structure
+
+```
+src/
+  index.ts              CLI entry point
+  commands/             setup, status, check, providers, version
+  utils/                config, constants, logger, free-provider catalog
+scripts/                setup.sh and start.sh (Bash, no Node.js needed)
+docs/                   user guides (Portuguese)
+.github/workflows/      CI: build, lint and publish
+```
+
+---
+
+## Development
+
+```bash
+npm install
+npm run build      # compile TypeScript to dist/
+npm run dev        # run src/index.ts with ts-node
+npm run lint       # ESLint
+npm test           # Jest
+```
+
+Contributions are welcome:
+
+1. Fork the repository
+2. Create a branch: `git checkout -b feature/your-feature`
+3. Commit your changes: `git commit -m "feat: describe your change"`
+4. Push the branch: `git push origin feature/your-feature`
+5. Open a pull request
+
+Please open an issue first for larger changes.
+
+---
+
+## Author's reported results
+
+These numbers come from the author's own usage. They have not been independently verified and will vary with your models, limits and workload.
+
+| Metric | Value |
+|--------|-------|
+| Input tokens | 260.7 million |
+| Output tokens | 1.3 million |
+| Requests | 6,623 |
+| Success rate (with combo) | 68% |
+| List-price cost | US$ 63.07 |
+| Real cost (free providers) | US$ 0.00 |
+| Reported saving | 89% (vs. US$ 113.58 before) |
+
+---
+
+## License
+
+Released under the [MIT License](LICENSE).
+
+---
+
+## Acknowledgements
+
+- [OmniRoute](https://github.com/cheaper-inference/OmniRoute), the AI gateway this tool is built for
+- [Fernando Paulino](https://github.com/ferpa2505-art), author of the guide *"IA BARATA de Verdade"*
+- The open-source AI community
 
 ---
 
 <div align="center">
-  <p><strong>Easy-O-Route</strong> - O facilitador definitivo para o OmniRoute</p>
-  <p>✨ Feito com ❤️ pela comunidade de IA open source</p>
+  <p><strong>Easy-O-Route</strong>: the friendly helper for OmniRoute</p>
 </div>

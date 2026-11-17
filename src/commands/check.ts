@@ -1,5 +1,5 @@
 import { Command } from 'commander';
-import { execSync } from 'child_process';
+import { execSync, spawnSync } from 'child_process';
 import {
   logInfo,
   logSuccess,
@@ -10,6 +10,11 @@ import {
   logItem,
   logList,
 } from '../utils/logger';
+import {
+  SUGGESTED_ECONOMIC_COMBO,
+  getMissingFreeProviders,
+} from '../utils/freeProviders';
+import { OMNIROUTE } from '../utils/constants';
 
 export const checkCommand = new Command('check')
   .description('Verificar configuração do OmniRoute e sugerir melhorias')
@@ -30,15 +35,15 @@ export const checkCommand = new Command('check')
         const version = execSync('omniroute --version').toString().trim();
         logItem('Versão do OmniRoute', version);
         
-        // Check if outdated
-        if (version === '3.8.52') {
+        // Compare with the version this tool was tested against
+        if (version.includes(OMNIROUTE.VERSION)) {
+          logSuccess(`✅ OmniRoute está na versão testada (${OMNIROUTE.VERSION})`);
+        } else {
           issues.push({
             type: 'warn',
-            message: 'OmniRoute está desatualizado (3.8.52 → 3.8.53)',
-            fix: 'npm update -g omniroute'
+            message: `OmniRoute ${version} difere da versão testada pelo Easy-O-Route (${OMNIROUTE.VERSION})`,
+            fix: 'npm install -g omniroute'
           });
-        } else if (version === '3.8.53') {
-          logSuccess('✅ OmniRoute está na versão mais recente!');
         }
       } catch {
         issues.push({
@@ -52,14 +57,25 @@ export const checkCommand = new Command('check')
       logSection('2. Verificando se o OmniRoute está rodando');
       
       try {
-        execSync('curl -s http://localhost:20128/v1/models -H "Authorization: Bearer CHANGEME" 2>&1', { stdio: 'pipe' });
-        logSuccess('✅ OmniRoute está rodando!');
+        // Check if port 20128 is listening
+        const netstatOutput = execSync('netstat -ano | findstr 20128 | findstr LISTENING 2>&1', { stdio: 'pipe' }).toString();
+        if (netstatOutput.includes('LISTENING')) {
+          logSuccess('✅ OmniRoute está rodando!');
+        } else {
+          throw new Error('Port not listening');
+        }
       } catch {
-        issues.push({
-          type: 'warn',
-          message: 'OmniRoute não está rodando',
-          fix: 'omniroute'
-        });
+        try {
+          // Try to check using omniroute status command
+          execSync('omniroute status 2>&1', { stdio: 'pipe' });
+          logSuccess('✅ OmniRoute está rodando!');
+        } catch {
+          issues.push({
+            type: 'warn',
+            message: 'OmniRoute não está rodando ou não está acessível',
+            fix: 'omniroute'
+          });
+        }
       }
 
       // 3. Check Node.js version
@@ -90,79 +106,128 @@ export const checkCommand = new Command('check')
       // 4. Check providers
       logSection('4. Verificando Provedores Conectados');
       
+      let connectedProviders: string[] = [];
+      
+      // Suggest free providers
+      suggestions.push('💡 Provedores gratuitos recomendados:');
+      suggestions.push('   • Groq: Alta velocidade, modelos gratuitos (llama-3.1-8b-instant)');
+      suggestions.push('   • Mistral: Bom custo-benefício (mistral-tiny, mistral-small)');
+      suggestions.push('   • OpenRouter: Acesso a múltiplos provedores');
+      suggestions.push('   • Together: Centenas de modelos de código aberto');
+      suggestions.push('   • Fireworks: Modelos otimizados');
+      suggestions.push('');
+      suggestions.push('💡 Use: easy-o-route providers --setup-guide para ver instruções detalhadas');
+      suggestions.push('💡 Use: easy-o-route providers --recommended para ver a lista completa');
+      
+      // Try to list providers
       try {
-        const providersOutput = execSync('omniroute providers list --json 2>&1').toString();
-        const providers = JSON.parse(providersOutput);
+        // Use spawnSync with full path to npx
+        // Fixed command string (no user input), so shell use is safe here
+        const result = spawnSync('npx omniroute providers list --json', { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], shell: true });
+        const providersOutput = result.stdout || result.stderr || '';
         
-        if (providers && providers.length > 0) {
-          logItem('Provedores conectados', `${providers.length} provedores`);
-          
-          // Check for recommended providers
-          const providerNames = providers.map((p: any) => p.name || p.id).join(', ');
-          logInfo(`Provedores: ${providerNames}`);
-          
-          // Suggest more providers if less than 3
-          if (providers.length < 3) {
-            suggestions.push('💡 Conecte pelo menos 3 provedores para melhor fallback (Mistral, NVIDIA, Groq)');
+        if (providersOutput && providersOutput.trim()) {
+          // Remove any ANSI escape codes
+          // eslint-disable-next-line no-control-regex
+          const noAnsi = providersOutput.replace(/\u001b\[[0-9;]*m/g, '');
+          // Find JSON in the output (starts with {)
+          const jsonMatch = noAnsi.match(/\{[\s\S]*\}/);
+          if (jsonMatch) {
+            const providers = JSON.parse(jsonMatch[0]);
+            
+            if (providers && providers.providers && providers.providers.length > 0) {
+              const providersList = providers.providers;
+              connectedProviders = providersList.map((p: any) => p.name || p.provider || p.id);
+              logItem('Provedores conectados', `${providersList.length} provedores`);
+              
+              // Check for recommended providers
+              const providerNames = connectedProviders.join(', ');
+              logInfo(`Provedores: ${providerNames}`);
+              
+              // Suggest more providers if less than 3
+              if (providersList.length < 3) {
+                logWarn('⚠️ Recomendamos conectar pelo menos 3 provedores para melhor fallback');
+              } else {
+                logSuccess('✅ você tem uma boa quantidade de provedores conectados!');
+              }
+              
+              // Check for paid providers
+              const paidProviders = ['anthropic', 'deepseek'];
+              const hasPaid = connectedProviders.some(p => 
+                paidProviders.some(paid => p.toLowerCase().includes(paid))
+              );
+              
+              if (!hasPaid) {
+                logInfo('ℹ️ Considere adicionar um provedor pago (DeepSeek) como última reserva');
+              }
+              
+              // Check for free providers and suggest missing ones
+              const missingFreeProviders = getMissingFreeProviders(connectedProviders);
+              if (missingFreeProviders.length > 0) {
+                const missingNames = missingFreeProviders.map(p => p.displayName).join(', ');
+                logInfo(`ℹ️ Adicione provedores gratuitos: ${missingNames.substring(0, 60)}${missingNames.length > 60 ? '...' : ''}`);
+              } else {
+                logSuccess('✅ Todos os provedores gratuitos recomendados estão conectados!');
+              }
+            } else {
+              logWarn('⚠️ Nenhum provedor conectado');
+              logInfo('ℹ️ Conecte provedores no painel: http://localhost:20128');
+            }
           }
-          
-          // Check for paid providers
-          const paidProviders = ['anthropic', 'deepseek'];
-          const hasPaid = providers.some((p: any) => 
-            paidProviders.some(paid => (p.name || p.id).toLowerCase().includes(paid))
-          );
-          
-          if (!hasPaid) {
-            suggestions.push('💡 Considere adicionar um provedor pago (DeepSeek) como última reserva');
-          }
-          
-        } else {
-          issues.push({
-            type: 'error',
-            message: 'Nenhum provedor conectado',
-            fix: 'Conecte provedores no painel: http://localhost:20128'
-          });
         }
       } catch (error: any) {
-        issues.push({
-          type: 'error',
-          message: 'Não foi possível listar provedores',
-          fix: 'omniroute providers list'
-        });
+        // If we can't list providers, just show the suggestions
+        logWarn('⚠️ Não foi possível listar provedores (verifique se o OmniRoute está rodando)');
       }
 
       // 5. Check combos
       logSection('5. Verificando Combos');
       
+      // Suggest combo
+      suggestions.push(`💡 Crie um combo "${SUGGESTED_ECONOMIC_COMBO.name}" para economia de tokens`);
+      suggestions.push('   Provedores sugeridos: Groq, Mistral, OpenRouter, Together');
+      suggestions.push('   Acesse: http://localhost:20128 → Combos → Novo Combo');
+      suggestions.push('');
+      
+      // Try to list combos
       try {
-        const combosOutput = execSync('omniroute combo list --json 2>&1').toString();
-        const combos = JSON.parse(combosOutput);
+        // Use spawnSync with full path to npx
+        // Fixed command string (no user input), so shell use is safe here
+        const result = spawnSync('npx omniroute combo list --json', { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], shell: true });
+        const combosOutput = result.stdout || result.stderr || '';
         
-        if (combos && combos.length > 0) {
-          logItem('Combos configurados', `${combos.length} combos`);
-          combos.forEach((combo: any) => {
-            logInfo(`- ${combo.name || combo.id}: ${combo.models?.length || 0} modelos`);
-          });
-          
-          // Suggest economico combo
-          const hasEconomico = combos.some((c: any) => (c.name || c.id).toLowerCase().includes('economico'));
-          if (!hasEconomico) {
-            suggestions.push('💡 Crie um combo "economico" com gratuitos na frente e pagos por último');
+        if (combosOutput && combosOutput.trim()) {
+          // Remove any ANSI escape codes
+          // eslint-disable-next-line no-control-regex
+          const noAnsi = combosOutput.replace(/\u001b\[[0-9;]*m/g, '');
+          // Find JSON in the output (starts with {)
+          const jsonMatch = noAnsi.match(/\{[\s\S]*\}/);
+          if (jsonMatch) {
+            const combosData = JSON.parse(jsonMatch[0]);
+            const combos = combosData.combos || combosData;
+            
+            if (Array.isArray(combos) && combos.length > 0) {
+              logItem('Combos configurados', `${combos.length} combos`);
+              combos.forEach((combo: any) => {
+                logInfo(`- ${combo.name || combo.id}: ${combo.models?.length || 0} modelos`);
+              });
+              
+              // Suggest economico combo
+              const hasEconomico = combos.some((c: any) => (c.name || c.id).toLowerCase().includes('economico'));
+              if (!hasEconomico && connectedProviders.length >= 3) {
+                logInfo(`ℹ️ Sugestão: Crie um combo "${SUGGESTED_ECONOMIC_COMBO.name}" com seus provedores`);
+              } else {
+                logSuccess('✅ Você já tem combos configurados!');
+              }
+            } else {
+              logWarn('⚠️ Nenhum combo configurado');
+              logInfo('ℹ️ Crie um combo no painel: http://localhost:20128');
+            }
           }
-          
-        } else {
-          issues.push({
-            type: 'error',
-            message: 'Nenhum combo configurado',
-            fix: 'Crie um combo no painel: http://localhost:20128'
-          });
         }
       } catch (error: any) {
-        issues.push({
-          type: 'error',
-          message: 'Não foi possível listar combos',
-          fix: 'omniroute combo list'
-        });
+        // If we can't list combos, just show the suggestions
+        logWarn('⚠️ Não foi possível listar combos (verifique se o OmniRoute está rodando)');
       }
 
       // 6. Check if autostart is enabled
