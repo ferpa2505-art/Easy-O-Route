@@ -14,6 +14,7 @@ All notable changes to this project are documented here.
 - Documentation index listed chapters that do not exist.
 
 ### Added
+- `check` command to verify the OmniRoute installation, version, running status, environment, connected providers, combos and autostart; it also runs `omniroute doctor` and suggests fixes (`--fix`).
 - `providers` command (free-provider suggestions, setup guide, `--check`).
 - ESLint and Jest configuration, with initial tests for the free-provider catalog.
 - `.gitattributes` to keep LF line endings in the repository.
