@@ -1,234 +1,234 @@
-# 🚀 Guia Rápido Easy-O-Route
+# 🚀 Easy-O-Route Quick Guide
 
-> **Instale, configure e comece a economizar em 5 minutos!**
-
----
-
-## 🎯 O que é o Easy-O-Route?
-
-**Easy-O-Route** é uma **CLI (Command Line Interface)** que simplifica a configuração e uso do **[OmniRoute](https://github.com/cheaper-inference/OmniRoute)** - o roteador de IA que permite usar **múltiplos provedores de IA** de forma **econômica e eficiente**.
+> **Install, configure, and start saving in 5 minutes!**
 
 ---
 
-## ⚡ Instalação Rápida
+## 🎯 What is Easy-O-Route?
+
+**Easy-O-Route** is a **CLI (Command Line Interface)** that simplifies the setup and use of **[OmniRoute](https://github.com/cheaper-inference/OmniRoute)** — the AI router that allows you to use **multiple AI providers** in an **economical and efficient** way.
+
+---
+
+## ⚡ Quick Installation
 
 ### Windows / Mac / Linux
 
 ```bash
-# 1. Instalar Node.js (se não tiver)
-#    Baixe em: https://nodejs.org (versão LTS 24.x)
+# 1. Install Node.js (if not installed)
+#    Download from: https://nodejs.org (LTS 24.x version)
 
-# 2. Instalar o OmniRoute
+# 2. Install OmniRoute
 npm install -g omniroute
 
-# 3. Instalar o Easy-O-Route (opcional - coordenador)
+# 3. Install Easy-O-Route (optional - coordinator)
 npm install -g easy-o-route
 
-# 4. Ligar o OmniRoute
+# 4. Start OmniRoute
 omniroute
 ```
 
-> **✅ Pronto!** Acesse: [http://localhost:20128](http://localhost:20128)
+> **✅ Done!** Access: [http://localhost:20128](http://localhost:20128)
 
 ---
 
-## 🔧 Configuração Inicial
+## 🔧 Initial Setup
 
-### 1️⃣ Trocar a Senha
+### 1️⃣ Change the Password
 
-1. Entre com a senha padrão: **`CHANGEME`**
-2. Vá em **Configuração** → **Senha**
-3. Troque para uma senha segura
+1. Log in with the default password: **`CHANGEME`**
+2. Go to **Settings** → **Password**
+3. Change to a secure password
 
-### 2️⃣ Criar Chave do OmniRoute
+### 2️⃣ Create an OmniRoute Key
 
-1. Vá em **Endpoint** → **Chaves Registradas**
-2. Clique em **Criar Chave**
-3. Dê um nome (ex: `minha-cli`)
-4. Salve a chave em um lugar seguro
+1. Go to **Endpoint** → **Registered Keys**
+2. Click **Create Key**
+3. Give it a name (e.g., `my-cli`)
+4. Save the key securely
 
-### 3️⃣ Conectar Provedores
+### 3️⃣ Connect Providers
 
-**Provedores gratuitos recomendados:**
+**Recommended Free Providers:**
 
-| Provedor | Site | Taxa de Acerto |
-|----------|------|----------------|
-| Mistral | [console.mistral.ai](https://console.mistral.ai) | 95% |
-| NVIDIA | [build.nvidia.com](https://build.nvidia.com) | 81% |
-| Groq | [console.groq.com](https://console.groq.com) | 10% (recusa pedidos grandes) |
+| Provider | Website | Success Rate |
+|----------|---------|--------------|
+| Mistral  | [console.mistral.ai](https://console.mistral.ai) | 95% |
+| NVIDIA   | [build.nvidia.com](https://build.nvidia.com) | 81% |
+| Groq     | [console.groq.com](https://console.groq.com) | 10% (rejects large requests) |
 | Google Gemini | [aistudio.google.com](https://aistudio.google.com) | - |
 
-**Passos:**
-1. Crie conta no site do provedor
-2. Gere uma **Chave de API**
-3. No OmniRoute: **Provedores** → **Adicionar**
-4. Escolha o provedor e cole a chave
-5. Teste a conexão
+**Steps:**
+1. Create an account on the provider's website
+2. Generate an **API Key**
+3. In OmniRoute: **Providers** → **Add**
+4. Select the provider and paste the key
+5. Test the connection
 
 ---
 
-## 🎯 Criar seu Primeiro Combo
+## 🎯 Create Your First Combo
 
-**Combo = Fila de reserva: gratuitos na frente, pagos por último**
+**Combo = Reservation queue: free providers first, paid last**
 
-### Usando o Easy-O-Route CLI:
+### Using the Easy-O-Route CLI:
 
 ```bash
-# Criar combo "economico"
+# Create "economico" combo
 easy-o-route combo create economico \
   --strategy priority \
   --models "mistral/codestral-latest,nvidia/llama-3.2-90b,groq/llama-3.1-70b,deepseek/deepseek-chat"
 ```
 
-### Usando o Painel:
+### Using the Dashboard:
 
-1. Vá em **Combinações** → **Criar Combo**
-2. Dê um nome: `economico`
-3. Adicione modelos na ordem:
+1. Go to **Combos** → **Create Combo**
+2. Name: `economico`
+3. Add models in order:
    - `mistral/codestral-latest`
    - `nvidia/llama-3.2-90b`
    - `google/gemini-1.5-flash`
    - `groq/llama-3.1-70b`
-   - `deepseek/deepseek-chat` (pago - reserva)
-4. Escolha estratégia: **priority**
-5. Salve
+   - `deepseek/deepseek-chat` (paid - fallback)
+4. Choose strategy: **priority**
+5. Save
 
 ---
 
-## 🔗 Ligar suas Ferramentas
+## 🔗 Connect Your Tools
 
-### Claude Code (Recomendado)
+### Claude Code (Recommended)
 
 ```bash
-# Criar atalho para Claude Code
+# Create a shortcut for Claude Code
 echo "@echo off" > claude-easy.cmd
-echo "set OMNIROUTE_API_KEY=SUA_CHAVE" >> claude-easy.cmd
+echo "set OMNIROUTE_API_KEY=YOUR_KEY" >> claude-easy.cmd
 echo "set ANTHROPIC_BASE_URL=http://localhost:20128" >> claude-easy.cmd
-echo "set ANTHROPIC_API_KEY=SUA_CHAVE" >> claude-easy.cmd
+echo "set ANTHROPIC_API_KEY=%OMNIROUTE_API_KEY%" >> claude-easy.cmd
 echo "claude %*" >> claude-easy.cmd
 ```
 
-### Outras Ferramentas
+### Other Tools
 
-**Dados que toda ferramenta precisa:**
+**Data required by every tool:**
 
-| Campo | Valor |
+| Field | Value |
 |-------|-------|
-| URL base | `http://localhost:20128/v1` |
-| Chave de API | SUA_CHAVE_DO_OMNIROUTE |
-| Modelo | `combo/economico` ou `auto` |
+| Base URL | `http://localhost:20128/v1` |
+| API Key | YOUR_OMNIROUTE_KEY |
+| Model | `combo/economico` or `auto` |
 
 ---
 
-## 📊 Testar a Configuração
+## 📊 Test Your Setup
 
-### Teste rápido com curl:
+### Quick Test with cURL:
 
 ```bash
-# Listar modelos disponíveis
+# List available models
 curl http://localhost:20128/v1/models \
-  -H "Authorization: Bearer SUA_CHAVE"
+  -H "Authorization: Bearer YOUR_KEY"
 
-# Fazer uma pergunta
+# Ask a question
 curl http://localhost:20128/v1/chat/completions \
-  -H "Authorization: Bearer SUA_CHAVE" \
+  -H "Authorization: Bearer YOUR_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"model":"combo/economico","messages":[{"role":"user","content":"Explique o que é um token."}]}'
+  -d '{"model":"combo/economico","messages":[{"role":"user","content":"Explain what a token is."}]}'
 ```
 
-### Usando o Combo Studio:
+### Using Combo Studio:
 
-1. Vá em **Combo Studio**
-2. Escolha o combo `economico`
-3. Digite uma pergunta
-4. Veja qual provedor respondeu
-
----
-
-## 💰 Medir a Economia
-
-### Painel do OmniRoute:
-
-1. Vá em **Análises** → **Visão Geral**
-2. Veja:
-   - Tokens de entrada/saída
-   - Nível de cache (reutilização)
-   - Custo de tabela
-   - Taxa de acerto por provedor
-
-### Comparativo do Autor:
-
-| Período | Tokens | Custo sem OmniRoute | Custo com OmniRoute | Economia |
-|---------|--------|---------------------|---------------------|----------|
-| Set/2026 | 582,6M | US$ 113,58 | US$ 113,58 | 0% |
-| Out/2026 | 300M | ~US$ 60 | US$ 12,09 | **89%** |
+1. Go to **Combo Studio**
+2. Select the `economico` combo
+3. Type a question
+4. See which provider responded
 
 ---
 
-## 📌 Dicas Rápidas
+## 💰 Measure Your Savings
 
-### ✅ Faça isso:
+### OmniRoute Dashboard:
 
-1. **Comece com 3 provedores gratuitos** (Mistral, NVIDIA, Groq)
-2. **Modelos grandes na frente** para pedidos de ferramentas de código
-3. **Revise o combo a cada 2-3 semanas** (modelos mudam)
-4. **Defina tetos de gasto** em provedores pagos
-5. **Faça backup da pasta `~/.omniroute`**
+1. Go to **Analytics** → **Overview**
+2. Check:
+   - Input/output tokens
+   - Cache level (reusability)
+   - Cost table
+   - Success rate per provider
 
-### ❌ Não faça isso:
+### Author's Results:
 
-1. **Não cole chaves em chats ou grupos** (mesmo para pedir ajuda)
-2. **Não use modelos que recusam pedidos grandes na frente** (ex: Groq)
-3. **Não ignore erros 429** (limite de uso - o combo resolve)
-4. **Não confunda custo de tabela com custo real**
-5. **Não use provedores com cookie** (pode violar termos)
+| Period | Tokens | Cost Without OmniRoute | Cost With OmniRoute | Savings |
+|--------|--------|-----------------------|----------------------|---------|
+| Set/2026 | 582.6M | $113.58 | $113.58 | 0% |
+| Oct/2026 | 300M | ~$60 | $12.09 | **89%** |
 
 ---
 
-## 🆘 Resolver Problemas
+## 📌 Quick Tips
 
-### Erros comuns:
+### ✅ Do This:
 
-| Erro | Causa | Solução |
-|------|-------|---------|
-| **429** | Limite de uso | Combo com fallbacks |
-| **413** | Pedido grande | Modelos grandes na frente |
-| **529/503** | Servidor lotado | Tentar novamente |
-| **401** | Chave errada | Verificar chave API |
-| **403** | Cota esgotada | Verificar cota |
-| **404** | Modelo não existe | Remover do combo |
+1. **Start with 3 free providers** (Mistral, NVIDIA, Groq)
+2. **Place larger models first** for coding tool requests
+3. **Review your combo every 2-3 weeks** (models change)
+4. **Set spending limits** for paid providers
+5. **Backup the `~/.omniroute` folder**
 
-### Check-up:
+### ❌ Avoid This:
+
+1. **Do not share API keys in chats or groups** (even for help)
+2. **Do not use providers that reject large requests first** (e.g., Groq)
+3. **Do not ignore 429 errors** (rate limits - the combo handles this)
+4. **Do not confuse cost table with actual cost**
+5. **Do not use providers with cookies** (may violate terms)
+
+---
+
+## 🆘 Troubleshooting
+
+### Common Errors:
+
+| Error | Cause | Solution |
+|-------|-------|----------|
+| **429** | Rate limit | Combo with fallbacks |
+| **413** | Large request | Place larger models first |
+| **529/503** | Server overloaded | Retry |
+| **401** | Invalid key | Verify API key |
+| **403** | Quota exhausted | Check quota |
+| **404** | Model not found | Remove from combo |
+
+### Checkup:
 
 ```bash
-# Verificar se tudo está certo
+# Verify everything is correct
 omniroute doctor
 
-# Testar todos os provedores
+# Test all providers
 omniroute providers test-all
 ```
 
 ---
 
-## 🎓 Próximos Passos
+## 🎓 Next Steps
 
-1. **Leia o ebook completo**: [Documentação](README.md)
-2. **Aprofunde-se**: Chapters 01-13
-3. **Contribua**: [GitHub](https://github.com/ferpa2505-art/Easy-O-Route)
-4. **Compartilhe**: Compartilhe com a comunidade!
+1. **Read the full ebook**: [Documentation](README.md)
+2. **Dive deeper**: Chapters 01-13
+3. **Contribute**: [GitHub](https://github.com/ferpa2505-art/Easy-O-Route)
+4. **Share**: Share with the community!
 
 ---
 
-## 📞 Suporte
+## 📞 Support
 
-- **Documentação**: [docs/](.)
+- **Documentation**: [docs/](.)
 - **Issues**: [GitHub Issues](https://github.com/ferpa2505-art/Easy-O-Route/issues)
-- **Discussões**: [GitHub Discussions](https://github.com/ferpa2505-art/Easy-O-Route/discussions)
+- **Discussions**: [GitHub Discussions](https://github.com/ferpa2505-art/Easy-O-Route/discussions)
 
 ---
 
 <div align="center">
-  <h2>✨ Easy-O-Route - Guia Rápido</h2>
-  <p>O facilitador definitivo para o OmniRoute</p>
-  <p>Feito com ❤️ pela comunidade de IA open source</p>
+  <h2>✨ Easy-O-Route - Quick Guide</h2>
+  <p>The definitive facilitator for OmniRoute</p>
+  <p>Made with ❤️ by the open-source AI community</p>
 </div>

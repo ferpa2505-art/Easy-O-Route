@@ -1,24 +1,36 @@
 # Changelog
 
-All notable changes to this project are documented here.
+All notable changes to **Easy-O-Route** will be documented in this file.
 
-## [1.0.1]
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-### Fixed
-- Build failed because of unused imports in an unregistered command.
-- Hardcoded OmniRoute version checks replaced by a single constant (`OMNIROUTE.VERSION`).
-- `setup.sh` and `start.sh` had Windows line endings, which broke them under bash.
-- Installing from GitHub (`npm install -g <repo-url>`) did not build `dist/`; added a `prepare` script.
-- npm package included internal files; added an explicit `files` list.
-- CI ignored lint and test failures and auto-published on every push to `main`. Publishing now runs only when a release is published.
-- Documentation index listed chapters that do not exist.
+## [1.0.1] - 2026-11-18
 
 ### Added
-- `check` command to verify the OmniRoute installation, version, running status, environment, connected providers, combos and autostart; it also runs `omniroute doctor` and suggests fixes (`--fix`).
-- `providers` command (free-provider suggestions, setup guide, `--check`).
-- ESLint and Jest configuration, with initial tests for the free-provider catalog.
-- `.gitattributes` to keep LF line endings in the repository.
-- English README.
 
-## [1.0.0]
-- First public release.
+- English translations for all documentation files.
+- `CONTRIBUTING.md` with contribution guidelines.
+- `CHANGELOG.md` to track project changes.
+
+### Changed
+
+- Updated installation instructions in `INSTALACAO.md`.
+- Improved provider setup guide in `GUIA-RAPIDO.md`.
+
+### Fixed
+
+- Corrected links in `README.md` to point to English versions.
+
+## [1.0.0] - 2026-11-17
+
+Initial release of **Easy-O-Route** with:
+
+- CLI for OmniRoute configuration.
+- Provider management commands.
+- Combo creation and testing.
+- Documentation in Portuguese.
+
+[1.0.1]: https://github.com/ferpa2505-art/Easy-O-Route/compare/v1.0.0...v1.0.1
+[1.0.0]: https://github.com/ferpa2505-art/Easy-O-Route/releases/tag/v1.0.0
+

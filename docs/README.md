@@ -1,60 +1,60 @@
-# Easy-O-Route: Documentação
+# Easy-O-Route: Documentation
 
-> Guias em português, baseados no ebook *"IA BARATA de Verdade"*.
+> English guides based on the ebook *"IA BARATA de Verdade".*
 
-Esta pasta contém os guias do **Easy-O-Route**. Se você é novo, comece pelo Guia Rápido.
+This folder contains the guides for **Easy-O-Route**. If you're new, start with the Quick Guide.
 
 ---
 
-## Por onde começar
+## Getting Started
 
-| Guia | Para quem é | Link |
+| Guide | For Whom | Link |
 |------|-------------|------|
-| **Guia Rápido** | Quer instalar e rodar em cerca de 5 minutos | [GUIA-RAPIDO.md](GUIA-RAPIDO.md) |
-| **Guia de Instalação** | Quer a instalação detalhada, passo a passo | [INSTALACAO.md](INSTALACAO.md) |
+| **Quick Guide** | Want to install and run in about 5 minutes | [GUIA-RAPIDO.md](GUIA-RAPIDO.md) |
+| **Installation Guide** | Want a detailed, step-by-step installation | [INSTALACAO.md](INSTALACAO.md) |
 
 ---
 
-## Capítulos do ebook
+## Ebook Chapters
 
-### Parte 1: Entendendo os conceitos
+### Part 1: Understanding the Concepts
 
-| # | Capítulo | Descrição |
+| # | Chapter | Description |
 |---|----------|-----------|
-| 1 | [Por que a IA fica cara](CAPITULO-01-POR-QUE-A-IA-FICA-CARA.md) | Tokens, preços e onde está o desperdício |
-| 2 | [O que é o OmniRoute](CAPITULO-02-O-QUE-E-O-OMNIROUTE.md) | Central de IAs, combos e estratégias |
+| 1 | [Why AI is Expensive](CAPITULO-01-POR-QUE-A-IA-FICA-CARA.md) | Tokens, pricing, and where waste occurs |
+| 2 | [What is OmniRoute](CAPITULO-02-O-QUE-E-O-OMNIROUTE.md) | AI hub, combos, and strategies |
 
-### Parte 2: Instalação e primeiro uso
+### Part 2: Installation and First Use
 
-| # | Capítulo | Descrição |
+| # | Chapter | Description |
 |---|----------|-----------|
-| 3 | [Antes de começar](CAPITULO-03-ANTES-DE-COMECAR.md) | Requisitos, contas e regras de segurança |
-| 4 | [Instalando o OmniRoute](CAPITULO-04-INSTALANDO-O-OMNIROUTE.md) | Windows, macOS e Linux |
-| 5 | [Primeiro acesso ao painel](CAPITULO-05-PRIMEIRO-ACESSO-AO-PAINEL.md) | Navegação, troca de senha e teste rápido |
+| 3 | [Before You Start](CAPITULO-03-ANTES-DE-COMECAR.md) | Requirements, accounts, and security rules |
+| 4 | [Installing OmniRoute](CAPITULO-04-INSTALANDO-O-OMNIROUTE.md) | Windows, macOS, and Linux |
+| 5 | [First Access to the Dashboard](CAPITULO-05-PRIMEIRO-ACESSO-AO-PAINEL.md) | Navigation, password change, and quick test |
 
-> **Em preparação:** os capítulos sobre conexão de provedores, combos, uso de ferramentas, medição de custos, limites e problemas ainda não foram escritos. Para ver como configurar provedores agora, use `easy-o-route providers --setup-guide`.
-
----
-
-## Regras básicas
-
-1. **Não coloque chaves de API em chats, grupos ou issues.**
-2. **Não use provedores que dependem de cookies do navegador** (podem violar os termos de uso).
-3. **Troque a senha padrão** do OmniRoute no primeiro acesso.
-4. **Confira os limites gratuitos atuais** de cada provedor, porque eles mudam com frequência.
+> **In Progress:** Chapters on connecting providers, combos, tool usage, cost measurement, limits, and troubleshooting are not yet written. To see how to configure providers now, use `easy-o-route providers --setup-guide`.
 
 ---
 
-## Recursos
+## Basic Rules
 
-- [OmniRoute (projeto oficial)](https://github.com/cheaper-inference/OmniRoute)
-- Painel local do OmniRoute: `http://localhost:20128` (disponível após a instalação)
-- Problemas com o Easy-O-Route: [GitHub Issues](https://github.com/ferpa2505-art/Easy-O-Route/issues)
+1. **Do not share API keys in chats, groups, or issues.**
+2. **Do not use providers that depend on browser cookies** (may violate terms of use).
+3. **Change the default password** of OmniRoute on first access.
+4. **Check current free quotas** for each provider, as they change frequently.
 
 ---
 
-## Pesquisar na documentação
+## Resources
+
+- [OmniRoute (Official Project)](https://github.com/cheaper-inference/OmniRoute)
+- OmniRoute Local Dashboard: `http://localhost:20128` (available after installation)
+- Easy-O-Route Issues: [GitHub Issues](https://github.com/ferpa2505-art/Easy-O-Route/issues)
+
+---
+
+## Search the Documentation
 
 ```bash
-grep -ri "termo" docs/
+grep -ri "term" docs/
 ```

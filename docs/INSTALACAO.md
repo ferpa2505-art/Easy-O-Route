@@ -1,83 +1,83 @@
-# 📋 Guia de Instalação Completo - Easy-O-Route
+# 📋 Complete Installation Guide - Easy-O-Route
 
-> **Guia passo a passo para instalar e configurar o Easy-O-Route e o OmniRoute**
-
----
-
-## 🎯 Visão Geral
-
-Este guia contém **todos os passos necessários** para:
-1. Instalar o Node.js
-2. Instalar o OmniRoute
-3. Instalar o Easy-O-Route (opcional, mas recomendado)
-4. Configurar o ambiente
-5. Testar a instalação
+> Step-by-step guide to install and configure Easy-O-Route and OmniRoute.
 
 ---
 
-## 📋 Pré-requisitos
+## 🎯 Overview
 
-### Sistema Operacional
+This guide contains **all necessary steps** to:
+1. Install Node.js
+2. Install OmniRoute
+3. Install Easy-O-Route (optional, but recommended)
+4. Configure the environment
+5. Test the installation
+
+---
+
+## 📋 Prerequisites
+
+### Operating System
 - ✅ **Windows** 10/11 (64-bit)
-- ✅ **macOS** 10.15+ (Catalina ou superior)
-- ✅ **Linux** (qualquer distribuição moderna: Ubuntu, Fedora, Debian, etc.)
+- ✅ **macOS** 10.15+ (Catalina or later)
+- ✅ **Linux** (any modern distribution: Ubuntu, Fedora, Debian, etc.)
 
-### Requisitos de Hardware
-- **CPU**: Qualquer processador moderno
-- **RAM**: 4GB mínimo (recomendado 8GB+)
-- **Espaço em disco**: 500MB livre
-- **Conexão com a internet**: Estável
+### Hardware Requirements
+- **CPU**: Any modern processor
+- **RAM**: 4GB minimum (8GB+ recommended)
+- **Disk Space**: 500MB free
+- **Internet Connection**: Stable
 
 ---
 
-## 🚀 Passo 1: Instalar o Node.js
+## 🚀 Step 1: Install Node.js
 
-O OmniRoute e o Easy-O-Route requerem o **Node.js** versão **22.x ou 24.x**.
+OmniRoute and Easy-O-Route require **Node.js version 22.x or 24.x**.
 
 ### Windows
 
-1. **Baixe o Node.js** em: [https://nodejs.org](https://nodejs.org)
-2. **Selecionar versão LTS** (24.x recomendado)
-3. **Execute o instalador** e siga as instruções
-4. **Verifique a instalação**
+1. **Download Node.js** from: [https://nodejs.org](https://nodejs.org)
+2. **Select LTS version** (24.x recommended)
+3. **Run the installer** and follow instructions
+4. **Verify installation**
 
 ### Mac
 
-#### Opção A: Usando o site oficial
-1. Acesse: [https://nodejs.org](https://nodejs.org)
-2. Baixe a versão LTS (24.x)
-3. Execute o instalador
+#### Option A: Official Website
+1. Access: [https://nodejs.org](https://nodejs.org)
+2. Download LTS version (24.x)
+3. Run the installer
 
-#### Opção B: Usando Homebrew (recomendado)
+#### Option B: Using Homebrew (Recommended)
 ```bash
-# Instalar Homebrew (se não tiver)
+# Install Homebrew (if not installed)
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
-# Instalar Node.js
+# Install Node.js
 brew install node@24
 
-# Adicionar ao PATH
+# Add to PATH
 echo 'export PATH="/usr/local/opt/node@24/bin:$PATH"' >> ~/.zshrc
 echo 'export PATH="/usr/local/opt/node@24/bin:$PATH"' >> ~/.bashrc
 
-# Recarregar shell
-source ~/.zshrc  # ou ~/.bashrc
+# Reload shell
+source ~/.zshrc  # or ~/.bashrc
 ```
 
 ### Linux (Ubuntu/Debian)
 
 ```bash
-# Instalar dependências
+# Install dependencies
 sudo apt update
 sudo apt install -y curl gnupg ca-certificates
 
-# Adicionar repositório do NodeSource
+# Add NodeSource repository
 curl -fsSL https://deb.nodesource.com/setup_24.x | sudo -E bash -
 
-# Instalar Node.js
+# Install Node.js
 sudo apt install -y nodejs
 
-# Verificar instalação
+# Verify installation
 node --version
 npm --version
 ```
@@ -85,55 +85,55 @@ npm --version
 ### Linux (Fedora/RHEL/CentOS)
 
 ```bash
-# Instalar Node.js 24.x
+# Install Node.js 24.x
 curl -fsSL https://rpm.nodesource.com/setup_24.x | sudo bash -
 sudo dnf install -y nodejs
 
-# Verificar instalação
+# Verify installation
 node --version
 npm --version
 ```
 
-### Verificar Instalação
+### Verify Installation
 
 ```bash
-# Verificar Node.js
+# Check Node.js
 node --version
-# Deve mostrar: v24.x.x
+# Should show: v24.x.x
 
-# Verificar npm
+# Check npm
 npm --version
-# Deve mostrar: 10.x.x ou superior
+# Should show: 10.x.x or higher
 ```
 
-> **⚠️ Se os comandos não funcionarem, reinicie o terminal ou o computador**
+> **⚠️ If commands don't work, restart the terminal or computer.**
 
 ---
 
-## 🚀 Passo 2: Instalar o OmniRoute
+## 🚀 Step 2: Install OmniRoute
 
-### Método 1: Instalação Global (Recomendado)
+### Method 1: Global Installation (Recommended)
 
 ```bash
-# Instalar globalmente
+# Install globally
 npm install -g omniroute
 
-# Verificar versão
+# Check version
 omniroute --version
-# Deve mostrar: 3.8.53 ou superior
+# Should show: 3.8.53 or higher
 ```
 
-#### Se houver erro com npm 11+:
+#### If there's an error with npm 11+:
 
 ```bash
-# Liberar scripts necessários
+# Allow necessary scripts
 npm install -g omniroute --allow-scripts=omniroute,keytar,onnxruntime-node,@parcel/watcher,@swc/core,protobufjs,esbuild --force
 ```
 
-### Método 2: Usando Docker (Linux/Mac)
+### Method 2: Using Docker (Linux/Mac)
 
 ```bash
-# Rodar com Docker
+# Run with Docker
 docker run -d \
   --name omniroute \
   --restart unless-stopped \
@@ -143,88 +143,88 @@ docker run -d \
   diegosouzapw/omniroute:latest
 ```
 
-> **⚠️ O Docker usa 1GB de memória por padrão. Para ferramentas de programação, pode ser necessário aumentar.**
+> **⚠️ Docker uses 1GB of memory by default. For programming tools, you may need to increase it.**
 
-### Verificar Instalação
+### Verify Installation
 
 ```bash
-# Verificar se o comando está disponível
+# Check if command is available
 which omniroute  # Linux/Mac
 where omniroute  # Windows
 
-# Verificar versão
+# Check version
 omniroute --version
 ```
 
 ---
 
-## 🚀 Passo 3: Instalar o Easy-O-Route (Opcional, mas Recomendado)
+## 🚀 Step 3: Install Easy-O-Route (Optional, but Recommended)
 
-### Método 1: Instalação Global
+### Method 1: Global Installation
 
 ```bash
-# Instalar globalmente
+# Install globally
 npm install -g easy-o-route
 
-# Verificar
+# Verify
 Easy-O-Route --version
-# ou
+# or
 easy-o-route --version
 ```
 
-### Método 2: Instalação Local (Para desenvolvimento)
+### Method 2: Local Installation (For Development)
 
 ```bash
-# Clonar repositório
+# Clone repository
 git clone https://github.com/ferpa2505-art/Easy-O-Route.git
 cd Easy-O-Route
 
-# Instalar dependências
+# Install dependencies
 npm install
 
-# Link global (para usar o comando easy-o-route)
+# Link globally (to use the easy-o-route command)
 npm link
 
-# Verificar
+# Verify
 easy-o-route --version
 ```
 
-### Método 3: Usar Scripts Bash (Sem Node.js)
+### Method 3: Use Bash Scripts (No Node.js)
 
 ```bash
-# Baixar scripts
+# Download scripts
 curl -L https://raw.githubusercontent.com/ferpa2505-art/Easy-O-Route/main/scripts/setup.sh -o setup.sh
 curl -L https://raw.githubusercontent.com/ferpa2505-art/Easy-O-Route/main/scripts/start.sh -o start.sh
 
-# Tornar executáveis
+# Make executable
 chmod +x setup.sh start.sh
 
-# Executar setup
+# Run setup
 ./setup.sh
 ```
 
 ---
 
-## 🚀 Passo 4: Configurar o OmniRoute
+## 🚀 Step 4: Configure OmniRoute
 
-### Iniciar o OmniRoute
+### Start OmniRoute
 
 ```bash
-# Iniciar
+# Start
 omniroute
 ```
 
-> **💡 Deixe a janela aberta e acesse o painel em: [http://localhost:20128](http://localhost:20128)**
+> **💡 Keep the window open and access the dashboard at: [http://localhost:20128](http://localhost:20128)**
 
-### Primeiro Acesso
+### First Access
 
-1. **Senha padrão**: `CHANGEME`
-2. **Troque a senha** imediatamente (Configuração → Senha)
-3. **Salve a nova senha** em um gerenciador de senhas
+1. **Default password**: `CHANGEME`
+2. **Change the password** immediately (Settings → Password)
+3. **Save the new password** in a password manager
 
-> **⚠️ NUNCA compartilhe esta senha!**
+> **⚠️ NEVER share this password!**
 
-### Configurar Início Automático
+### Configure Auto-Start
 
 ```bash
 # Windows
@@ -233,87 +233,87 @@ omniroute autostart enable
 # Linux
 omniroute autostart enable
 
-# Mac (use o app OmniRouteTray)
+# Mac (use OmniRouteTray app)
 # brew install --cask zoispag/tap/omniroute-tray
 ```
 
 ---
 
-## 🚀 Passo 5: Configurar Provedores
+## 🚀 Step 5: Configure Providers
 
-### Provedores Gratuitos Recomendados
+### Recommended Free Providers
 
-| Provedor | Site | Taxa de Acerto | Latência |
-|----------|------|----------------|----------|
+| Provider | Website | Success Rate | Latency |
+|----------|---------|--------------|---------|
 | **Mistral** | [console.mistral.ai](https://console.mistral.ai) | 95% | ~6.6s |
 | **NVIDIA** | [build.nvidia.com](https://build.nvidia.com) | 81% | ~16.5s |
 | **Groq** | [console.groq.com](https://console.groq.com) | 10% | ~0.8s |
 | **Google** | [aistudio.google.com](https://aistudio.google.com) | - | ~3.8s |
 
-### Passos para conectar cada provedor:
+### Steps to Connect Each Provider:
 
-1. **Crie uma conta** no site do provedor
-2. **Gere uma Chave de API** (na área do desenvolvedor)
-3. **Copie a chave**
-4. **No OmniRoute**:
-   - Vá em **Provedores**
-   - Clique em **Adicionar**
-   - Escolha o provedor
-   - Cole a chave
-   - Salve
-5. **Teste a conexão**
+1. **Create an account** on the provider's website
+2. **Generate an API Key** (in the developer area)
+3. **Copy the key**
+4. **In OmniRoute**:
+   - Go to **Providers**
+   - Click **Add**
+   - Select the provider
+   - Paste the key
+   - Save
+5. **Test the connection**
 
-### Exemplo: Conectar Mistral
+### Example: Connect Mistral
 
-1. Acesse: [https://console.mistral.ai](https://console.mistral.ai)
-2. Crie conta ou faça login
-3. Vá em **API Keys** ou **Settings**
-4. Crie uma nova chave
-5. Copie a chave
-6. No OmniRoute:
-   - **Provedores** → **Adicionar**
-   - Selecione **Mistral**
-   - Cole a chave
-   - **Salvar**
-   - **Testar conexão**
+1. Access: [https://console.mistral.ai](https://console.mistral.ai)
+2. Create account or log in
+3. Go to **API Keys** or **Settings**
+4. Create a new key
+5. Copy the key
+6. In OmniRoute:
+   - **Providers** → **Add**
+   - Select **Mistral**
+   - Paste the key
+   - **Save**
+   - **Test connection**
 
 ---
 
-## 🚀 Passo 6: Criar seu Primeiro Combo
+## 🚀 Step 6: Create Your First Combo
 
-### O que é um Combo?
+### What is a Combo?
 
-Um **combo** é uma **fila de reserva** de modelos de IA. O OmniRoute:
-1. Tenta o **primeiro modelo**
-2. Se falhar, tenta o **segundo**
-3. Se falhar, tenta o **terceiro**
-4. E assim por diante...
+A **combo** is a **reservation queue** of AI models. OmniRoute:
+1. Tries the **first model**
+2. If it fails, tries the **second**
+3. If it fails, tries the **third**
+4. And so on...
 
-### Combo Recomendado: "economico"
+### Recommended Combo: "economico"
 
 ```
-🟢 Gratuitos (na frente)
-├── 1. mistral/codestral-latest        (95% de acerto)
-├── 2. nvidia/llama-3.2-90b            (81% de acerto)
-├── 3. google/gemini-1.5-flash        (bom para textos longos)
-├── 4. openrouter/mistralai/mistral-7b (reserva)
-├── 5. groq/llama-3.1-70b              (10% de acerto - recusa pedidos grandes)
-├── 6. cloudflare/llama-3.1-8b         (reserva)
-└── 🔴 Pagos (por último)
-    ├── 7. deepseek/deepseek-chat     (pago - reserva)
-    └── 8. anthropic/claude-haiku-5.5  (pago - última reserva)
+🟢 Free (first)
+├── 1. mistral/codestral-latest        (95% success)
+├── 2. nvidia/llama-3.2-90b            (81% success)
+├── 3. google/gemini-1.5-flash        (good for long texts)
+├── 4. openrouter/mistralai/mistral-7b (fallback)
+├── 5. groq/llama-3.1-70b              (10% success - rejects large requests)
+├── 6. cloudflare/llama-3.1-8b         (fallback)
+└── 🔴 Paid (last resort)
+    ├── 7. deepseek/deepseek-chat     (paid - fallback)
+    └── 8. anthropic/claude-haiku-5.5  (paid - ultimate fallback)
 ```
 
-### Criar Combo pelo Painel:
+### Create Combo via Dashboard:
 
-1. Vá em **Combinações** (ou **Combos**)
-2. Clique em **Criar Combo**
-3. Dê um nome: `economico`
-4. Adicione os modelos na ordem acima
-5. Escolha estratégia: **priority**
-6. **Salvar**
+1. Go to **Combos** (or **Combinations**)
+2. Click **Create Combo**
+3. Name: `economico`
+4. Add models in the order above
+5. Choose strategy: **priority**
+6. **Save**
 
-### Criar Combo pela CLI (Easy-O-Route):
+### Create Combo via CLI (Easy-O-Route):
 
 ```bash
 easy-o-route combo create economico \
@@ -323,141 +323,141 @@ easy-o-route combo create economico \
 
 ---
 
-## 🚀 Passo 7: Criar Chave do OmniRoute
+## 🚀 Step 7: Create an OmniRoute Key
 
-### Para suas ferramentas falarem com o OmniRoute, você precisa de uma **Chave do OmniRoute**.
+### To connect your tools to OmniRoute, you need an **OmniRoute Key**.
 
-1. Vá em **Endpoint** → **Chaves Registradas**
-2. Clique em **Criar Chave**
-3. Dê um nome: `claude-code` (ou o nome da sua ferramenta)
-4. **Salvar**
-5. **Copie a chave** gerada
-6. **Guarde em um gerenciador de senhas**
+1. Go to **Endpoint** → **Registered Keys**
+2. Click **Create Key**
+3. Name: `claude-code` (or your tool's name)
+4. **Save**
+5. **Copy the generated key**
+6. **Store it securely**
 
-> **⚠️ Esta chave também é uma senha! Nunca compartilhe!**
+> **⚠️ This key is also a password! Never share it!**
 
 ---
 
-## 🚀 Passo 8: Configurar suas Ferramentas
+## 🚀 Step 8: Configure Your Tools
 
-### Toda ferramenta precisa de 3 dados:
+### Every tool needs 3 pieces of data:
 
-| Campo | Valor | Exemplo |
+| Field | Value | Example |
 |-------|-------|---------|
-| **URL base** | Endereço do OmniRoute | `http://localhost:20128/v1` |
-| **Chave de API** | Chave do OmniRoute | `OR-xyz123...` |
-| **Modelo** | Combo ou modelo | `combo/economico` ou `auto` |
+| **Base URL** | OmniRoute address | `http://localhost:20128/v1` |
+| **API Key** | OmniRoute key | `OR-xyz123...` |
+| **Model** | Combo or model | `combo/economico` or `auto` |
 
-### Exemplo: Claude Code
+### Example: Claude Code
 
 #### Windows (PowerShell)
 
 ```powershell
-# Criar atalho
+# Create shortcut
 New-Item -Path "claude-easy.cmd" -ItemType File -Value @'
 @echo off
-set OMNIROUTE_API_KEY=SUA_CHAVE_DO_OMNIROUTE
+set OMNIROUTE_API_KEY=YOUR_OMNIROUTE_KEY
 set ANTHROPIC_BASE_URL=http://localhost:20128
 set ANTHROPIC_API_KEY=%OMNIROUTE_API_KEY%
 claude %*
 '@
 
-# Tornar executável (opcional)
-# Move para pasta no PATH
+# Make executable (optional)
+# Move to PATH folder
 ```
 
-#### Usando Easy-O-Route CLI:
+#### Using Easy-O-Route CLI:
 
 ```bash
-# Configurar automaticamente
+# Configure automatically
 easy-o-route configure opencode --dry-run
 
-# Ou manualmente
-# Copie o comando gerado e execute
+# Or manually
+# Copy the generated command and run it
 ```
 
-### Outras Ferramentas
+### Other Tools
 
 **Continue, Cursor, Cline, Aider, OpenCode, etc.**
 
-Todos aceitam os 3 campos. Procure por:
-- **API URL** ou **Base URL**
+All require the 3 fields. Look for:
+- **API URL** or **Base URL**
 - **API Key**
-- **Model** ou **Model Name**
+- **Model** or **Model Name**
 
 ---
 
-## 🚀 Passo 9: Testar Tudo
+## 🚀 Step 9: Test Everything
 
-### Teste 1: Listar Modelos
+### Test 1: List Models
 
 ```bash
-# Usando curl
+# Using curl
 curl http://localhost:20128/v1/models \
-  -H "Authorization: Bearer SUA_CHAVE_DO_OMNIROUTE"
+  -H "Authorization: Bearer YOUR_OMNIROUTE_KEY"
 ```
 
-> **✅ Deve mostrar uma lista de modelos em JSON**
+> **✅ Should show a list of models in JSON**
 
-### Teste 2: Fazer uma Pergunta
+### Test 2: Ask a Question
 
 ```bash
 curl http://localhost:20128/v1/chat/completions \
-  -H "Authorization: Bearer SUA_CHAVE_DO_OMNIROUTE" \
+  -H "Authorization: Bearer YOUR_OMNIROUTE_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"model":"combo/economico","messages":[{"role":"user","content":"Explique o que é um token."}]}'
+  -d '{"model":"combo/economico","messages":[{"role":"user","content":"Explain what a token is."}]}'
 ```
 
-> **✅ Deve mostrar uma resposta da IA**
+> **✅ Should show an AI response**
 
-### Teste 3: Usar Combo Studio
+### Test 3: Use Combo Studio
 
-1. Vá em **Combo Studio**
-2. Escolha o combo `economico`
-3. Digite: "Explique o que é um token"
-4. Veja qual provedor respondeu
+1. Go to **Combo Studio**
+2. Select the `economico` combo
+3. Type: "Explain what a token is"
+4. See which provider responded
 
 ---
 
-## ✅ Verificação Final
+## ✅ Final Verification
 
 ```bash
-# Verificar se o OmniRoute está rodando
-curl -s http://localhost:20128/v1/models > /dev/null && echo "✅ OmniRoute está rodando" || echo "❌ OmniRoute não está rodando"
+# Check if OmniRoute is running
+curl -s http://localhost:20128/v1/models > /dev/null && echo "✅ OmniRoute is running" || echo "❌ OmniRoute is not running"
 
-# Verificar versão
+# Check version
 omniroute --version
 
-# Verificar se o Easy-O-Route está instalado (opcional)
+# Check if Easy-O-Route is installed (optional)
 easy-o-route --version
 
-# Verificar provedores conectados
+# Check connected providers
 omniroute providers list
 
-# Verificar combos
+# Check combos
 omniroute combo list
 ```
 
 ---
 
-## 🆘 Solução de Problemas
+## 🆘 Troubleshooting
 
-### Problema: OmniRoute não inicia
+### Problem: OmniRoute won't start
 
-**Solução:**
+**Solution:**
 ```bash
-# Verificar logs
+# Check logs
 cat ~/.omniroute/omniroute.log  # Linux/Mac
-# ou
+# or
 cat %USERPROFILE%\.omniroute\omniroute.log  # Windows
 
-# Executar doctor
+# Run doctor
 omniroute doctor
 ```
 
-### Problema: Port 20128 em uso
+### Problem: Port 20128 in use
 
-**Solução:**
+**Solution:**
 ```bash
 # Windows
 netstat -ano | findstr 20128
@@ -468,62 +468,62 @@ lsof -i :20128
 kill -9 <PID>
 ```
 
-### Problema: Erro 401 (Não autorizado)
+### Problem: Error 401 (Unauthorized)
 
-**Solução:**
-- Verifique se a **chave do OmniRoute** está correta
-- Verifique se a **URL está correta** (`http://localhost:20128/v1`)
-- Tente trocar a senha do painel
+**Solution:**
+- Verify the **OmniRoute key** is correct
+- Verify the **URL is correct** (`http://localhost:20128/v1`)
+- Try changing the dashboard password
 
-### Problema: Erro 429 (Limite de uso)
+### Problem: Error 429 (Rate Limit)
 
-**Solução:**
-- **Normal!** O combo passa para o próximo provedor automaticamente
-- Verifique seus provedores em **Provedores** → **Cota**
-- Espere ou adicione mais provedores
-
----
-
-## 📋 Checklist de Instalação
-
-- [ ] Node.js instalado (22.x ou 24.x)
-- [ ] npm instalado (10.x+)
-- [ ] OmniRoute instalado (`npm install -g omniroute`)
-- [ ] OmniRoute iniciado (`omniroute`)
-- [ ] Painel acessível (http://localhost:20128)
-- [ ] Senha trocada (de CHANGEME)
-- [ ] Início automático configurado (`omniroute autostart enable`)
-- [ ] Pelo menos 3 provedores conectados
-- [ ] Combo "economico" criado
-- [ ] Chave do OmniRoute criado
-- [ ] Ferramenta configurada (Claude Code, etc.)
-- [ ] Teste realizado com sucesso
+**Solution:**
+- **Normal!** The combo automatically switches to the next provider
+- Check your provider quotas in **Providers** → **Quota**
+- Wait or add more providers
 
 ---
 
-## 🎉 Parabéns!
+## 📋 Installation Checklist
 
-Você concluiu a instalação do **Easy-O-Route** e do **OmniRoute**! 🎉
-
-Agora você está pronto para:
-- ✅ Economizar até **89%** nos custos com IA
-- ✅ Usar múltiplos provedores de forma organizadas
-- ✅ Monitorar o uso e os custos
-- ✅ Ter fallback automático quando um provedor falha
+- [ ] Node.js installed (22.x or 24.x)
+- [ ] npm installed (10.x+)
+- [ ] OmniRoute installed (`npm install -g omniroute`)
+- [ ] OmniRoute started (`omniroute`)
+- [ ] Dashboard accessible (http://localhost:20128)
+- [ ] Password changed (from CHANGEME)
+- [ ] Auto-start configured (`omniroute autostart enable`)
+- [ ] At least 3 providers connected
+- [ ] Combo "economico" created
+- [ ] OmniRoute key created
+- [ ] Tool configured (Claude Code, etc.)
+- [ ] Test completed successfully
 
 ---
 
-## 📖 Próximos Passos
+## 🎉 Congratulations!
 
-1. **Leia o ebook completo**: [Documentação](README.md)
-2. **Aprofunde-se**: Chapters 06-13
-3. **Monitore o uso**: painel do OmniRoute → Análises
-4. **Ajuste seu combo**: Adicione/remova provedores conforme necessário
-5. **Compartilhe**: Conte para a comunidade!
+You have completed the **Easy-O-Route** and **OmniRoute** installation! 🎉
+
+Now you are ready to:
+- ✅ Save up to **89%** on AI costs
+- ✅ Use multiple providers in an organized way
+- ✅ Monitor usage and costs
+- ✅ Have automatic fallback when a provider fails
+
+---
+
+## 📖 Next Steps
+
+1. **Read the full ebook**: [Documentation](README.md)
+2. **Dive deeper**: Chapters 06-13
+3. **Monitor usage**: OmniRoute dashboard → Analytics
+4. **Adjust your combo**: Add/remove providers as needed
+5. **Share**: Tell the community!
 
 ---
 
 <div align="center">
-  <h2>✨ Guia de Instalação - Easy-O-Route</h2>
-  <p>Pronto para economizar com IA!</p>
+  <h2>✨ Installation Guide - Easy-O-Route</h2>
+  <p>Ready to save with AI!</p>
 </div>
