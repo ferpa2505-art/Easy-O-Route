@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Easy-O-Route & OmniRoute Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --surface: #f8fafc;
+            --surface-hover: #f1f5f9;
+            --text: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --code-bg: #1e293b;
+            --code-text: #f8fafc;
+            --brain-bg: #f1f5f9;
+            --brain-border: #e2e8f0;
+            --neuron-inactive: #9ca3af;
+            --neuron-active: #3b82f6;
+            --neuron-pulse: rgba(59, 130, 246, 0.5);
+            --connection-inactive: #e2e8f0;
+            --connection-active: #3b82f6;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) {
+                --primary: #60a5fa;
+                --primary-hover: #3b82f6;
+                --surface: #334155;
+                --surface-hover: #475569;
+                --text: #f8fafc;
+                --text-muted: #94a3b8;
+                --border: #475569;
+                --code-bg: #1e293b;
+                --code-text: #f8fafc;
+                --brain-bg: #1e293b;
+                --brain-border: #334155;
+                --neuron-inactive: #64748b;
+                --neuron-active: #60a5fa;
+                --neuron-pulse: rgba(96, 165, 250, 0.5);
+                --connection-inactive: #475569;
+                --connection-active: #60a5fa;
+            }
+        }
+
+        :root[data-theme="dark"] {
+            --primary: #60a5fa;
+            --primary-hover: #3b82f6;
+            --surface: #334155;
+            --surface-hover: #475569;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #475569;
+            --code-bg: #1e293b;
+            --code-text: #f8fafc;
+            --brain-bg: #1e293b;
+            --brain-border: #334155;
+            --neuron-inactive: #64748b;
+            --neuron-active: #60a5fa;
+            --neuron-pulse: rgba(96, 165, 250, 0.5);
+            --connection-active: #60a5fa;
+            --connection-inactive: #475569;
+        }
+
+        .brain-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 400px;
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .brain {
+            position: relative;
+            width: 300px;
+            height: 200px;
+            background-color: var(--brain-bg);
+            border-radius: 50%;
+            border: 2px solid var(--brain-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .brain-core {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background-color: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+        }
+
+        .neuron {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: var(--neuron-inactive);
+            transition: all 0.3s ease;
+        }
+
+        .neuron.active {
+            background-color: var(--neuron-active);
+            box-shadow: 0 0 10px var(--neuron-pulse);
+        }
+
+        .connection {
+            position: absolute;
+            height: 2px;
+            background-color: var(--connection-inactive);
+            border-radius: 1px;
+            transition: all 0.3s ease;
+        }
+
+        .connection.active {
+            background-color: var(--connection-active);
+        }
+
+        .provider-label {
+            position: absolute;
+            font-size: 12px;
+            text-align: center;
+            color: var(--text);
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+        }
+
+        .topology-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .active-neuron {
+            background-color: var(--neuron-active);
+        }
+
+        .inactive-neuron {
+            background-color: var(--neuron-inactive);
+        }
+
+        .card {
+            background-color: var(--surface);
+            border-radius: 8px;
+            padding: 20px;
+            border: 1px solid var(--border);
+        }
+
+        .badge-info {
+            background-color: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+        }
+    </style>
+</head>
+<body class="min-h-screen" data-theme="light">
+    <div class="max-w-6xl mx-auto space-y-8">
+        <!-- Header -->
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 card p-6">
+            <div>
+                <div class="flex items-center gap-3">
+                    <span class="text-3xl">🚀</span>
+                    <h1 class="text-2xl font-bold tracking-tight">Easy-O-Route & OmniRoute</h1>
+                    <span class="px-2.5 py-1 text-xs font-semibold rounded-full badge-info">v1.0.1</span>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <button onclick="toggleTheme()" class="px-4 py-2 text-sm font-medium rounded-lg card hover:bg-[var(--surface-hover)] transition cursor-pointer">
+                    <span id="theme-toggle">🌓 Dark Mode</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Tabs -->
+        <div class="flex gap-2 mb-6">
+            <button id="btn-overview" onclick="switchTab('overview')" class="px-4 py-2 text-sm font-semibold rounded-lg bg-[var(--primary)] text-white transition cursor-pointer">Overview</button>
+            <button id="btn-providers" onclick="switchTab('providers')" class="px-4 py-2 text-sm font-medium rounded-lg card hover:bg-[var(--surface-hover)] transition cursor-pointer">Providers</button>
+            <button id="btn-combo" onclick="switchTab('combo')" class="px-4 py-2 text-sm font-medium rounded-lg card hover:bg-[var(--surface-hover)] transition cursor-pointer">Combo</button>
+            <button id="btn-tools" onclick="switchTab('tools')" class="px-4 py-2 text-sm font-medium rounded-lg card hover:bg-[var(--surface-hover)] transition cursor-pointer">Tools</button>
+            <button id="btn-savings" onclick="switchTab('savings')" class="px-4 py-2 text-sm font-medium rounded-lg card hover:bg-[var(--surface-hover)] transition cursor-pointer">Savings</button>
+            <button id="btn-topology" onclick="switchTab('topology')" class="px-4 py-2 text-sm font-medium rounded-lg card hover:bg-[var(--surface-hover)] transition cursor-pointer">Topology</button>
+        </div>
+
+        <!-- Tab 1: Overview -->
+        <section id="tab-overview" class="space-y-6">
+            <div class="card p-6 space-y-4">
+                <h3 class="text-lg font-bold">📊 Overview</h3>
+                <p class="text-sm text-[var(--text-muted)]">Easy-O-Route is a CLI coordinator for OmniRoute, the AI router that manages priority combo reservation queues for cost savings and high reliability.</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="card p-4">
+                        <h4 class="text-sm font-bold">Total Providers</h4>
+                        <p class="text-2xl font-bold">5</p>
+                        <p class="text-xs text-[var(--text-muted)]">Connected AI providers</p>
+                    </div>
+                    <div class="card p-4">
+                        <h4 class="text-sm font-bold">Active Combo</h4>
+                        <p class="text-2xl font-bold">economico</p>
+                        <p class="text-xs text-[var(--text-muted)]">Priority reservation queue</p>
+                    </div>
+                    <div class="card p-4">
+                        <h4 class="text-sm font-bold">Savings</h4>
+                        <p class="text-2xl font-bold">89%</p>
+                        <p class="text-xs text-[var(--text-muted)]">Compared to direct provider costs</p>
+                    </div>
+                </div>
+
+                <div class="card p-4">
+                    <h4 class="text-sm font-bold">System Status</h4>
+                    <div class="flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full bg-green-500"></span>
+                        <span class="text-sm">OmniRoute running</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full bg-green-500"></span>
+                        <span class="text-sm">Easy-O-Route connected</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tab 2: Providers -->
+        <section id="tab-providers" class="space-y-6 hidden">
+            <div class="card p-6 space-y-4">
+                <h3 class="text-lg font-bold">🔧 Providers</h3>
+                <p class="text-sm text-[var(--text-muted)]">Configured AI providers and their status.</p>
+
+                <table class="w-full border-collapse">
+                    <thead>
+                        <tr class="border-b">
+                            <th class="py-3 px-4 text-left text-sm font-semibold">Provider</th>
+                            <th class="py-3 px-4 text-left text-sm font-semibold">Role</th>
+                            <th class="py-3 px-4 text-left text-sm font-semibold">Success Rate</th>
+                            <th class="py-3 px-4 text-left text-sm font-semibold">Latency</th>
+                            <th class="py-3 px-4 text-left text-sm font-semibold">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="py-3 px-4 font-semibold">Mistral</td>
+                            <td class="py-3 px-4"><span class="px-2 py-1 text-xs rounded-full badge-info">Primary</span></td>
+                            <td class="py-3 px-4">95%</td>
+                            <td class="py-3 px-4">~6.6s</td>
+                            <td class="py-3 px-4 text-green-500 font-medium">Online</td>
+                        </tr>
+                        <tr>
+                            <td class="py-3 px-4 font-semibold">NVIDIA</td>
+                            <td class="py-3 px-4"><span class="px-2 py-1 text-xs rounded-full badge-info">Secondary</span></td>
+                            <td class="py-3 px-4">81%</td>
+                            <td class="py-3 px-4">~16.5s</td>
+                            <td class="py-3 px-4 text-green-500 font-medium">Online</td>
+                        </tr>
+                        <tr>
+                            <td class="py-3 px-4 font-semibold">Google Gemini</td>
+                            <td class="py-3 px-4"><span class="px-2 py-1 text-xs rounded-full badge-info">Tertiary</span></td>
+                            <td class="py-3 px-4">90%</td>
+                            <td class="py-3 px-4">~3.8s</td>
+                            <td class="py-3 px-4 text-green-500 font-medium">Online</td>
+                        </tr>
+                        <tr>
+                            <td class="py-3 px-4 font-semibold">Groq</td>
+                            <td class="py-3 px-4"><span class="px-2 py-1 text-xs rounded-full badge-info">Fallback</span></td>
+                            <td class="py-3 px-4">10%</td>
+                            <td class="py-3 px-4">~0.8s</td>
+                            <td class="py-3 px-4 text-amber-500 font-medium">Online (Limited)</td>
+                        </tr>
+                        <tr>
+                            <td class="py-3 px-4 font-semibold">DeepSeek</td>
+                            <td class="py-3 px-4"><span class="px-2 py-1 text-xs rounded-full badge-info">Fallback</span></td>
+                            <td class="py-3 px-4">99%</td>
+                            <td class="py-3 px-4">~2.1s</td>
+                            <td class="py-3 px-4 text-amber-500 font-medium">Paid (Low Cost)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Tab 3: Combo -->
+        <section id="tab-combo" class="space-y-6 hidden">
+            <div class="card p-6 space-y-4">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h3 class="text-lg font-bold">🧠 Provider Topology</h3>
+                        <p class="text-sm text-[var(--text-muted)]">Real-time visualization of Easy-O-Route as a central brain and AI providers as connected neurons.</p>
+                    </div>
+                    <button onclick="switchToTopology()" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-[var(--primary)] text-white hover:bg-[var(--primary-hover)] transition cursor-pointer">Start Simulation</button>
+                </div>
+
+                <!-- Topology Visualization -->
+                <div class="brain-container">
+                    <div class="brain">
+                        <div class="brain-core">EOR</div>
+                        <!-- Neurons will be added dynamically -->
+                    </div>
+                </div>
+
+                <!-- Legend -->
+                <div class="topology-legend">
+                    <div class="legend-item">
+                        <div class="legend-color active-neuron"></div>
+                        <span class="text-xs">Provedor Ativo</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color inactive-neuron"></div>
+                        <span class="text-xs">Provedor Inativo</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: var(--connection-active);"></div>
+                        <span class="text-xs">Conexão Ativa</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: var(--connection-inactive);"></div>
+                        <span class="text-xs">Conexão Inativa</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tab 4: Tools -->
+        <section id="tab-tools" class="space-y-6 hidden">
+            <div class="card p-6 space-y-4">
+                <h3 class="text-lg font-bold">🛠️ Tool Integration (Claude Code & Others)</h3>
+                <p class="text-sm text-[var(--text-muted)]">Connect any developer tool supporting OpenAI or Anthropic endpoints using your OmniRoute key.</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm font-medium border-b border-[var(--border)] pb-4">
+                    <div>Base URL: <code class="text-xs px-2 py-1 rounded bg-[var(--surface-hover)]">http://localhost:20128/v1</code></div>
+                    <div>API Key: <code class="text-xs px-2 py-1 rounded bg-[var(--surface-hover)]">OR-xyz123...</code></div>
+                    <div>Model: <code class="text-xs px-2 py-1 rounded bg-[var(--surface-hover)]">combo/economico</code></div>
+                </div>
+
+                <div class="space-y-2 pt-2">
+                    <h4 class="text-sm font-bold">Claude Code Shortcut Script (Windows PowerShell / .cmd)</h4>
+                    <pre class="p-4 rounded-lg text-xs overflow-x-auto bg-[var(--code-bg)] text-[var(--code-text)]">@echo off
+set OMNIROUTE_API_KEY=YOUR_OMNIROUTE_KEY
+set ANTHROPIC_BASE_URL=http://localhost:20128
+set ANTHROPIC_API_KEY=%OMNIROUTE_API_KEY%
+claude %*</pre>
+
+                    <h4 class="text-sm font-bold">Linux/macOS Bash Script</h4>
+                    <pre class="p-4 rounded-lg text-xs overflow-x-auto bg-[var(--code-bg)] text-[var(--code-text)]">#!/bin/bash
+OMNIROUTE_API_KEY="YOUR_OMNIROUTE_KEY"
+ANTHROPIC_BASE_URL="http://localhost:20128"
+ANTHROPIC_API_KEY="$OMNIROUTE_API_KEY"
+claude "$@"</pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tab 5: Savings -->
+        <section id="tab-savings" class="space-y-6 hidden">
+            <div class="card p-6 space-y-4">
+                <h3 class="text-lg font-bold">💰 Savings Analytics</h3>
+                <p class="text-sm text-[var(--text-muted)]">Track your cost savings with OmniRoute.</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="card p-4">
+                        <h4 class="text-sm font-bold">Monthly Savings</h4>
+                        <p class="text-2xl font-bold">$12.09</p>
+                        <p class="text-xs text-[var(--text-muted)]">Compared to direct provider costs</p>
+                    </div>
+                    <div class="card p-4">
+                        <h4 class="text-sm font-bold">Tokens Processed</h4>
+                        <p class="text-2xl font-bold">300M</p>
+                        <p class="text-xs text-[var(--text-muted)]">This month</p>
+                    </div>
+                </div>
+
+                <div class="card p-4">
+                    <h4 class="text-sm font-bold">Cost Comparison</h4>
+                    <table class="w-full border-collapse">
+                        <thead>
+                            <tr class="border-b">
+                                <th class="py-2 px-4 text-left text-xs font-semibold">Period</th>
+                                <th class="py-2 px-4 text-left text-xs font-semibold">Tokens</th>
+                                <th class="py-2 px-4 text-left text-xs font-semibold">Cost Without OmniRoute</th>
+                                <th class="py-2 px-4 text-left text-xs font-semibold">Cost With OmniRoute</th>
+                                <th class="py-2 px-4 text-left text-xs font-semibold">Savings</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="py-3 px-4">Set/2026</td>
+                                <td class="py-3 px-4">582.6M</td>
+                                <td class="py-3 px-4">$113.58</td>
+                                <td class="py-3 px-4">$113.58</td>
+                                <td class="py-3 px-4">0%</td>
+                            </tr>
+                            <tr>
+                                <td class="py-3 px-4">Oct/2026</td>
+                                <td class="py-3 px-4">300M</td>
+                                <td class="py-3 px-4">~$60</td>
+                                <td class="py-3 px-4">$12.09</td>
+                                <td class="py-3 px-4 text-green-500 font-medium">89%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tab 6: Provider Topology -->
+        <section id="tab-topology" class="space-y-6 hidden">
+            <div class="card p-6 space-y-4">
+                <h3 class="text-lg font-bold">🧠 Real-Time Provider Topology</h3>
+                <p class="text-sm text-[var(--text-muted)]">Live visualization showing providers and combos.</p>
+                <div class="topology-container" id="topology-graph"></div>
+                <div class="topology-legend">
+                    <div class="legend-item">
+                        <div class="legend-color color-success"></div>
+                        <span>High Success Rate</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color color-warning"></div>
+                        <span>Medium Success Rate</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color color-danger"></div>
+                        <span>Low Success Rate</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <script>
+            function switchTab(tabId) {
+                ['overview', 'providers', 'combo', 'tools', 'savings', 'topology'].forEach(t => {
+                    document.getElementById('tab-' + t).classList.add('hidden');
+                    document.getElementById('btn-' + t).className = "px-4 py-2 text-sm font-medium rounded-lg card hover:bg-[var(--surface-hover)] transition cursor-pointer";
+                });
+                document.getElementById('tab-' + tabId).classList.remove('hidden');
+                document.getElementById('btn-' + tabId).className = "px-4 py-2 text-sm font-semibold rounded-lg bg-[var(--primary)] text-white transition cursor-pointer";
+            }
+
+            function toggleTheme() {
+                const current = document.documentElement.getAttribute('data-theme');
+                const next = current === 'dark' ? 'light' : 'dark';
+                document.documentElement.setAttribute('data-theme', next);
+                document.getElementById('theme-toggle').textContent = next === 'dark' ? '🌞 Light Mode' : '🌓 Dark Mode';
+            }
+
+            function switchToTopology() {
+                switchTab('topology');
+                // Initialize topology visualization
+                initializeTopology();
+            }
+
+            function initializeTopology() {
+                const brain = document.querySelector('.brain');
+                const providers = [
+                    { name: 'Mistral', x: 150, y: -100, active: true, successRate: 95, latency: '~6.6s' },
+                    { name: 'NVIDIA', x: 250, y: -50, active: true, successRate: 81, latency: '~16.5s' },
+                    { name: 'Google', x: 350, y: 0, active: true, successRate: 90, latency: '~3.8s' },
+                    { name: 'Groq', x: 250, y: 50, active: false, successRate: 10, latency: '~0.8s' },
+                    { name: 'DeepSeek', x: 150, y: 100, active: true, successRate: 99, latency: '~2.1s' }
+                ];
+
+                // Clear any existing visualization
+                brain.innerHTML = '<div class="brain-core">EOR</div>';
+
+                // Add neurons
+                providers.forEach(provider => {
+                    // Create neuron
+                    const neuron = document.createElement('div');
+                    neuron.className = 'neuron' + (provider.active ? ' active' : '');
+                    neuron.style.left = `${provider.x}px`;
+                    neuron.style.top = `${provider.y}px`;
+                    brain.appendChild(neuron);
+
+                    // Add provider label
+                    const label = document.createElement('div');
+                    label.className = 'provider-label';
+                    label.style.left = `${provider.x + 20}px`;
+                    label.style.top = `${provider.y - 20}px`;
+                    label.textContent = provider.name;
+                    brain.appendChild(label);
+
+                    // Add connection line
+                    const connection = document.createElement('div');
+                    connection.className = 'connection' + (provider.active ? ' active' : '');
+                    connection.style.left = '150px';
+                    connection.style.top = `${provider.y + 55}px`;
+                    connection.style.width = `${Math.abs(provider.x - 150)}px`;
+                    brain.appendChild(connection);
+
+                    // Add status info
+                    const status = document.createElement('div');
+                    status.className = 'provider-status';
+                    status.style.left = `${provider.x + 20}px`;
+                    status.style.top = `${provider.y + 20}px`;
+                    status.style.fontSize = '10px';
+                    status.innerHTML = `<span class="text-[var(--text-muted)]">${provider.successRate}%</span> | <span class="text-[var(--text-muted)]">${provider.latency}</span>`;
+                    brain.appendChild(status);
+                });
+
+                // Add request animation
+                const requestAnimation = () => {
+                    const neurons = document.querySelectorAll('.neuron');
+                    const connections = document.querySelectorAll('.connection');
+                    const activeNeurons = Math.floor(Math.random() * 3) + 1; // Random 1-3 active neurons
+
+                    // Reset all to inactive
+                    neurons.forEach(neuron => {
+                        neuron.classList.remove('active');
+                    });
+                    connections.forEach(connection => {
+                        connection.classList.remove('active');
+                    });
+
+                    // Activate random neurons and their connections
+                    for (let i = 0; i < activeNeurons; i++) {
+                        const randomIndex = Math.floor(Math.random() * providers.length);
+                        const provider = providers[randomIndex];
+
+                        if (provider.active) {
+                            const neuron = neurons[randomIndex];
+                            const connection = connections[randomIndex];
+
+                            neuron.classList.add('active');
+                            connection.classList.add('active');
+
+                            // Pulse effect
+                            neuron.style.transform = 'scale(1.2)';
+                            setTimeout(() => {
+                                neuron.style.transform = '';
+                            }, 300);
+                        }
+                    }
+                };
+
+                // Start animation
+                requestAnimation();
+                setInterval(requestAnimation, 2000);
+
+                // Add real-time data update simulation
+                setInterval(() => {
+                    // Simulate real-time updates
+                    const randomProvider = providers[Math.floor(Math.random() * providers.length)];
+
+                    // Update active status
+                    randomProvider.active = !randomProvider.active;
+
+                    // Update visualization
+                    const neuron = document.querySelectorAll('.neuron')[Math.floor(Math.random() * providers.length)];
+                    const connection = document.querySelectorAll('.connection')[Math.floor(Math.random() * providers.length)];
+
+                    if (randomProvider.active) {
+                        neuron.classList.add('active');
+                        connection.classList.add('active');
+                    } else {
+                        neuron.classList.remove('active');
+                        connection.classList.remove('active');
+                    }
+                }, 5000);
+            }
+
+            // Initialize the first tab
+            document.addEventListener('DOMContentLoaded', () => {
+                switchTab('overview');
+            });
+        </script>
+    </div>
+</body>
+</html>

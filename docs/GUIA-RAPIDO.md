@@ -1,6 +1,6 @@
 # 🚀 Easy-O-Route Quick Guide
 
-> **Install, configure, and start saving in 5 minutes!**
+> Install, configure, and start saving in 5 minutes!
 
 ---
 

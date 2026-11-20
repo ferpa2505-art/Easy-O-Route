@@ -66,7 +66,7 @@ npm install -g omniroute
 omniroute --version
 ```
 
-> **✅ Deve aparecer**: `3.8.53` (ou versão mais recente)
+> **✅ Deve aparecer**: `3.8.54` (ou versão mais recente)
 
 ### Passo 5: Ligue o OmniRoute
 

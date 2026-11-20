@@ -21,18 +21,18 @@ This folder contains the guides for **Easy-O-Route**. If you're new, start with 
 
 | # | Chapter | Description |
 |---|----------|-----------|
-| 1 | [Why AI is Expensive](CAPITULO-01-POR-QUE-A-IA-FICA-CARA.md) | Tokens, pricing, and where waste occurs |
-| 2 | [What is OmniRoute](CAPITULO-02-O-QUE-E-O-OMNIROUTE.md) | AI hub, combos, and strategies |
+| 1 | [Why AI is Expensive](CAPITULO-01-WHY-AI-COSTS-ARE-HIGH.md) | Tokens, pricing, and where waste occurs |
+| 2 | [What is OmniRoute](CAPITULO-02-WHAT-IS-OMNIROUTE.md) | AI hub, combos, and strategies |
 
 ### Part 2: Installation and First Use
 
 | # | Chapter | Description |
 |---|----------|-----------|
-| 3 | [Before You Start](CAPITULO-03-ANTES-DE-COMECAR.md) | Requirements, accounts, and security rules |
-| 4 | [Installing OmniRoute](CAPITULO-04-INSTALANDO-O-OMNIROUTE.md) | Windows, macOS, and Linux |
-| 5 | [First Access to the Dashboard](CAPITULO-05-PRIMEIRO-ACESSO-AO-PAINEL.md) | Navigation, password change, and quick test |
+| 3 | [Before You Start](CAPITULO-03-BEFORE-YOU-START.md) | Requirements, accounts, and security rules |
+| 4 | [Installing OmniRoute](CAPITULO-04-INSTALLING-OMNIROUTE.md) | Windows, macOS, and Linux |
+| 5 | [First Access to the Dashboard](CAPITULO-05-FIRST-ACCESS-TO-DASHBOARD.md) | Navigation, password change, and quick test |
 
-> **In Progress:** Chapters on connecting providers, combos, tool usage, cost measurement, limits, and troubleshooting are not yet written. To see how to configure providers now, use `easy-o-route providers --setup-guide`.
+> **Note:** Chapters on connecting providers, combos, tool usage, cost measurement, limits, and troubleshooting are in progress. For now, use `easy-o-route providers --setup-guide` for provider configuration.
 
 ---
 
