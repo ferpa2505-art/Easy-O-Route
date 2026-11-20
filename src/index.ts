@@ -8,6 +8,7 @@ import { statusCommand } from './commands/status';
 import { versionCommand } from './commands/version';
 import { checkCommand } from './commands/check';
 import { providersCommand } from './commands/providers';
+import { updateCommand } from './commands/update';
 import { logError } from './utils/logger';
 import { EASY_OROUTE } from './utils/constants';
 
@@ -41,6 +42,7 @@ export const main = () => {
   program.addCommand(versionCommand);
   program.addCommand(checkCommand);
   program.addCommand(providersCommand);
+  program.addCommand(updateCommand);
 
   // Help command
   program
