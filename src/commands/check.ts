@@ -187,21 +187,30 @@ export const checkCommand = new Command('check')
         let contexts: Record<string, number> = {};
         let contextChecked = false;
 
+        let combosRead = false;
+
         if (apiKey && serverUp) {
-          try {
-            const combosData = await apiGet<{ combos?: ComboLike[] } | ComboLike[]>('/api/combos', apiKey);
-            combos = Array.isArray(combosData) ? combosData : combosData.combos || [];
-            const modelsData = await apiGet<{ data?: Array<{ id: string; context_length?: number }> }>(
-              '/v1/models',
-              apiKey
-            );
-            contexts = {};
-            for (const m of modelsData.data || []) {
-              if (m.context_length) contexts[m.id] = m.context_length;
+          // Logo depois de iniciar, o servidor responde mas ainda está carregando: tenta algumas vezes
+          for (let attempt = 1; attempt <= 4 && !contextChecked; attempt++) {
+            try {
+              const combosData = await apiGet<{ combos?: ComboLike[] } | ComboLike[]>('/api/combos', apiKey);
+              combos = Array.isArray(combosData) ? combosData : combosData.combos || [];
+              combosRead = true;
+              const modelsData = await apiGet<{ data?: Array<{ id: string; context_length?: number }> }>(
+                '/v1/models',
+                apiKey
+              );
+              contexts = {};
+              for (const m of modelsData.data || []) {
+                if (m.context_length) contexts[m.id] = m.context_length;
+              }
+              contextChecked = true;
+            } catch {
+              if (attempt < 4) {
+                logInfo(`O OmniRoute ainda está carregando; tentando de novo em 10 segundos (${attempt}/3)...`);
+                await new Promise(resolve => setTimeout(resolve, 10000));
+              }
             }
-            contextChecked = true;
-          } catch {
-            logInfo('Não foi possível ler os combos pela API; usando a lista do terminal');
           }
         }
 
@@ -213,7 +222,10 @@ export const checkCommand = new Command('check')
             timeout: 60000,
           });
           const data = extractJson(result.stdout || '') as { combos?: ComboLike[] } | ComboLike[] | null;
-          combos = Array.isArray(data) ? data : data?.combos || [];
+          if (data !== null) {
+            combos = Array.isArray(data) ? data : data?.combos || [];
+            combosRead = true;
+          }
         }
 
         if (combos.length > 0) {
@@ -251,6 +263,12 @@ export const checkCommand = new Command('check')
           } else {
             logInfo('Para checar o contexto dos passos, defina OMNIROUTE_API_KEY ou use --api-key');
           }
+        } else if (!combosRead) {
+          // Não deu para ler: não afirma que "não há combos"
+          issues.push({
+            type: 'warn',
+            message: 'Não foi possível ler os combos (o servidor pode ainda estar iniciando). Rode o check de novo em 1 minuto.',
+          });
         } else {
           logWarn('Nenhum combo configurado');
           logInfo(`Crie um combo no painel: ${OMNIROUTE.LOCAL_URL}`);
