@@ -2,7 +2,7 @@
 export const OMNIROUTE = {
   NAME: 'OmniRoute',
   VERSION: '3.8.54',
-  URL: 'https://github.com/cheaper-inference/OmniRoute',
+  URL: 'https://github.com/diegosouzapw/OmniRoute',
   LOCAL_URL: 'http://localhost:20128',
   API_BASE: 'http://localhost:20128/v1',
   DEFAULT_PORT: 20128,

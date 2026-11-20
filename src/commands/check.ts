@@ -13,314 +13,371 @@ import {
 import {
   SUGGESTED_ECONOMIC_COMBO,
   getMissingFreeProviders,
+  COMBO_TIPS,
 } from '../utils/freeProviders';
 import { OMNIROUTE } from '../utils/constants';
+import {
+  MIN_COMBO_CONTEXT,
+  ComboLike,
+  analyzeComboContext,
+  apiGet,
+  extractJson,
+  findApiKey,
+  isServerUp,
+  maskEmails,
+} from '../utils/omniroute';
+
+interface Issue {
+  type: 'error' | 'warn';
+  message: string;
+  fix?: string;
+}
+
+// Roda um comando e devolve a saída (mesmo quando o comando termina com código diferente de zero)
+function runCapture(command: string, timeoutMs = 120000): string {
+  try {
+    return execSync(command, { stdio: 'pipe', timeout: timeoutMs }).toString();
+  } catch (error: unknown) {
+    const e = error as { stdout?: Buffer | string };
+    return e.stdout ? e.stdout.toString() : '';
+  }
+}
+
+function formatTokens(value: number): string {
+  return value >= 1_000_000
+    ? `${(value / 1_000_000).toFixed(1).replace('.0', '')} mi`
+    : `${Math.round(value / 1000)} mil`;
+}
 
 export const checkCommand = new Command('check')
   .description('Verificar configuração do OmniRoute e sugerir melhorias')
   .option('-f, --fix', 'Tentar corrigir problemas automaticamente')
-  .option('-v, --verbose', 'Exibir informações detalhadas')
+  .option('-v, --verbose', 'Exibir informações detalhadas (saída completa do doctor)')
+  .option('-k, --api-key <chave>', 'Chave do OmniRoute para checar o contexto dos combos (ou use OMNIROUTE_API_KEY)')
   .action(async (options) => {
     try {
       logTitle('🔍 Verificação Completa do OmniRoute');
 
-      // Track issues
-      const issues: { type: 'error' | 'warn' | 'info'; message: string; fix?: string }[] = [];
+      const issues: Issue[] = [];
       const suggestions: string[] = [];
 
-      // 1. Check if OmniRoute is installed
+      // 1. Instalação
       logSection('1. Verificando Instalação do OmniRoute');
-      
+
       try {
-        const version = execSync('omniroute --version').toString().trim();
+        const raw = execSync('omniroute --version', { stdio: 'pipe' }).toString();
+        const version = raw.split(/\r?\n/).map(l => l.trim()).filter(l => /^\d+\.\d+\.\d+/.test(l)).pop() || raw.trim();
         logItem('Versão do OmniRoute', version);
-        
-        // Compare with the version this tool was tested against
-        if (version.includes(OMNIROUTE.VERSION)) {
-          logSuccess(`✅ OmniRoute está na versão testada (${OMNIROUTE.VERSION})`);
+
+        if (version === OMNIROUTE.VERSION) {
+          logSuccess(`OmniRoute está na versão testada (${OMNIROUTE.VERSION})`);
         } else {
-          issues.push({
-            type: 'warn',
-            message: `OmniRoute ${version} difere da versão testada pelo Easy-O-Route (${OMNIROUTE.VERSION})`,
-            fix: 'npm install -g omniroute'
-          });
+          logInfo(`Versão diferente da testada pelo Easy-O-Route (${OMNIROUTE.VERSION}). Normalmente funciona; se algo falhar, confira o changelog.`);
         }
       } catch {
         issues.push({
           type: 'error',
           message: 'OmniRoute não está instalado',
-          fix: 'npm install -g omniroute'
+          fix: 'npm install -g omniroute',
         });
       }
 
-      // 2. Check if OmniRoute is running
+      // 2. Servidor
       logSection('2. Verificando se o OmniRoute está rodando');
-      
-      try {
-        // Check if port 20128 is listening
-        const netstatOutput = execSync('netstat -ano | findstr 20128 | findstr LISTENING 2>&1', { stdio: 'pipe' }).toString();
-        if (netstatOutput.includes('LISTENING')) {
-          logSuccess('✅ OmniRoute está rodando!');
-        } else {
-          throw new Error('Port not listening');
-        }
-      } catch {
-        try {
-          // Try to check using omniroute status command
-          execSync('omniroute status 2>&1', { stdio: 'pipe' });
-          logSuccess('✅ OmniRoute está rodando!');
-        } catch {
-          issues.push({
-            type: 'warn',
-            message: 'OmniRoute não está rodando ou não está acessível',
-            fix: 'omniroute'
-          });
-        }
+
+      const serverUp = await isServerUp();
+      if (serverUp) {
+        logSuccess(`OmniRoute está rodando! (${OMNIROUTE.LOCAL_URL})`);
+      } else {
+        issues.push({
+          type: 'warn',
+          message: 'OmniRoute não está rodando ou não está acessível',
+          // --no-tray evita o travamento do ícone da bandeja visto no Windows após atualizações
+          fix: 'omniroute serve --daemon --no-tray --no-open',
+        });
       }
 
-      // 3. Check Node.js version
+      // 3. Ambiente
       logSection('3. Verificando Ambiente');
-      
+
       try {
         const nodeVersion = execSync('node --version').toString().trim();
         const npmVersion = execSync('npm --version').toString().trim();
-        
+
         logItem('Node.js', nodeVersion);
         logItem('npm', npmVersion);
-        
+
         if (!nodeVersion.startsWith('v24') && !nodeVersion.startsWith('v22')) {
           issues.push({
             type: 'warn',
-            message: `Node.js ${nodeVersion} - Recomendado: v24.x ou v22.x`,
-            fix: 'Instale Node.js LTS em nodejs.org'
-          });
-        }
-      } catch (error: any) {
-        issues.push({
-          type: 'error',
-          message: 'Node.js não encontrado',
-          fix: 'Instale Node.js em nodejs.org'
-        });
-      }
-
-      // 4. Check providers
-      logSection('4. Verificando Provedores Conectados');
-      
-      let connectedProviders: string[] = [];
-      
-      // Suggest free providers
-      suggestions.push('💡 Provedores gratuitos recomendados:');
-      suggestions.push('   • Groq: Alta velocidade, modelos gratuitos (llama-3.1-8b-instant)');
-      suggestions.push('   • Mistral: Bom custo-benefício (mistral-tiny, mistral-small)');
-      suggestions.push('   • OpenRouter: Acesso a múltiplos provedores');
-      suggestions.push('   • Together: Centenas de modelos de código aberto');
-      suggestions.push('   • Fireworks: Modelos otimizados');
-      suggestions.push('');
-      suggestions.push('💡 Use: easy-o-route providers --setup-guide para ver instruções detalhadas');
-      suggestions.push('💡 Use: easy-o-route providers --recommended para ver a lista completa');
-      
-      // Try to list providers
-      try {
-        // Use spawnSync with full path to npx
-        // Fixed command string (no user input), so shell use is safe here
-        const result = spawnSync('npx omniroute providers list --json', { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], shell: true });
-        const providersOutput = result.stdout || result.stderr || '';
-        
-        if (providersOutput && providersOutput.trim()) {
-          // Remove any ANSI escape codes
-          // eslint-disable-next-line no-control-regex
-          const noAnsi = providersOutput.replace(/\u001b\[[0-9;]*m/g, '');
-          // Find JSON in the output (starts with {)
-          const jsonMatch = noAnsi.match(/\{[\s\S]*\}/);
-          if (jsonMatch) {
-            const providers = JSON.parse(jsonMatch[0]);
-            
-            if (providers && providers.providers && providers.providers.length > 0) {
-              const providersList = providers.providers;
-              connectedProviders = providersList.map((p: any) => p.name || p.provider || p.id);
-              logItem('Provedores conectados', `${providersList.length} provedores`);
-              
-              // Check for recommended providers
-              const providerNames = connectedProviders.join(', ');
-              logInfo(`Provedores: ${providerNames}`);
-              
-              // Suggest more providers if less than 3
-              if (providersList.length < 3) {
-                logWarn('⚠️ Recomendamos conectar pelo menos 3 provedores para melhor fallback');
-              } else {
-                logSuccess('✅ você tem uma boa quantidade de provedores conectados!');
-              }
-              
-              // Check for paid providers
-              const paidProviders = ['anthropic', 'deepseek'];
-              const hasPaid = connectedProviders.some(p => 
-                paidProviders.some(paid => p.toLowerCase().includes(paid))
-              );
-              
-              if (!hasPaid) {
-                logInfo('ℹ️ Considere adicionar um provedor pago (DeepSeek) como última reserva');
-              }
-              
-              // Check for free providers and suggest missing ones
-              const missingFreeProviders = getMissingFreeProviders(connectedProviders);
-              if (missingFreeProviders.length > 0) {
-                const missingNames = missingFreeProviders.map(p => p.displayName).join(', ');
-                logInfo(`ℹ️ Adicione provedores gratuitos: ${missingNames.substring(0, 60)}${missingNames.length > 60 ? '...' : ''}`);
-              } else {
-                logSuccess('✅ Todos os provedores gratuitos recomendados estão conectados!');
-              }
-            } else {
-              logWarn('⚠️ Nenhum provedor conectado');
-              logInfo('ℹ️ Conecte provedores no painel: http://localhost:20128');
-            }
-          }
-        }
-      } catch (error: any) {
-        // If we can't list providers, just show the suggestions
-        logWarn('⚠️ Não foi possível listar provedores (verifique se o OmniRoute está rodando)');
-      }
-
-      // 5. Check combos
-      logSection('5. Verificando Combos');
-      
-      // Suggest combo
-      suggestions.push(`💡 Crie um combo "${SUGGESTED_ECONOMIC_COMBO.name}" para economia de tokens`);
-      suggestions.push('   Provedores sugeridos: Groq, Mistral, OpenRouter, Together');
-      suggestions.push('   Acesse: http://localhost:20128 → Combos → Novo Combo');
-      suggestions.push('');
-      
-      // Try to list combos
-      try {
-        // Use spawnSync with full path to npx
-        // Fixed command string (no user input), so shell use is safe here
-        const result = spawnSync('npx omniroute combo list --json', { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], shell: true });
-        const combosOutput = result.stdout || result.stderr || '';
-        
-        if (combosOutput && combosOutput.trim()) {
-          // Remove any ANSI escape codes
-          // eslint-disable-next-line no-control-regex
-          const noAnsi = combosOutput.replace(/\u001b\[[0-9;]*m/g, '');
-          // Find JSON in the output (starts with {)
-          const jsonMatch = noAnsi.match(/\{[\s\S]*\}/);
-          if (jsonMatch) {
-            const combosData = JSON.parse(jsonMatch[0]);
-            const combos = combosData.combos || combosData;
-            
-            if (Array.isArray(combos) && combos.length > 0) {
-              logItem('Combos configurados', `${combos.length} combos`);
-              combos.forEach((combo: any) => {
-                logInfo(`- ${combo.name || combo.id}: ${combo.models?.length || 0} modelos`);
-              });
-              
-              // Suggest economico combo
-              const hasEconomico = combos.some((c: any) => (c.name || c.id).toLowerCase().includes('economico'));
-              if (!hasEconomico && connectedProviders.length >= 3) {
-                logInfo(`ℹ️ Sugestão: Crie um combo "${SUGGESTED_ECONOMIC_COMBO.name}" com seus provedores`);
-              } else {
-                logSuccess('✅ Você já tem combos configurados!');
-              }
-            } else {
-              logWarn('⚠️ Nenhum combo configurado');
-              logInfo('ℹ️ Crie um combo no painel: http://localhost:20128');
-            }
-          }
-        }
-      } catch (error: any) {
-        // If we can't list combos, just show the suggestions
-        logWarn('⚠️ Não foi possível listar combos (verifique se o OmniRoute está rodando)');
-      }
-
-      // 6. Check if autostart is enabled
-      logSection('6. Verificando Início Automático');
-      
-      try {
-        const autostartStatus = execSync('omniroute autostart status').toString();
-        logInfo(autostartStatus.trim());
-        
-        if (autostartStatus.includes('disabled')) {
-          issues.push({
-            type: 'warn',
-            message: 'Início automático desativado',
-            fix: 'omniroute autostart enable'
+            message: `Node.js ${nodeVersion} - Recomendado: v24.x (LTS) ou v22.22.2 em diante`,
+            fix: undefined,
           });
         }
       } catch {
-        logWarn('⚠️ Não foi possível verificar início automático');
+        issues.push({ type: 'error', message: 'Node.js não encontrado' });
       }
 
-      // 7. Check doctor
-      logSection('7. Executando omniroute doctor');
-      
+      // 4. Provedores
+      logSection('4. Verificando Provedores Conectados');
+
+      let connectedIds: string[] = [];
+
       try {
-        const doctorOutput = execSync('omniroute doctor').toString();
-        logInfo('--- Output do omniroute doctor ---');
-        console.log(doctorOutput);
-        logInfo('-----------------------------------');
-        
-        // Parse doctor output for issues
-        const doctorLines = doctorOutput.split('\n');
-        doctorLines.forEach(line => {
-          if (line.includes('ERROR') || line.includes('FAIL')) {
-            issues.push({
-              type: 'error',
-              message: line.trim(),
-              fix: 'omniroute doctor'
-            });
-          } else if (line.includes('WARN')) {
+        // Comando fixo (sem entrada do usuário), então o uso do shell é seguro
+        const result = spawnSync('omniroute providers list --json', {
+          encoding: 'utf8',
+          stdio: ['ignore', 'pipe', 'ignore'],
+          shell: true,
+          timeout: 60000,
+        });
+        const data = extractJson(result.stdout || '') as
+          | { providers?: unknown[]; connections?: unknown[] }
+          | unknown[]
+          | null;
+        const list = (Array.isArray(data) ? data : data?.providers || data?.connections || []) as Array<
+          Record<string, unknown>
+        >;
+
+        if (list.length > 0) {
+          const active = list.filter(p => p.isActive !== false && p.active !== false);
+          connectedIds = active.map(p => `${p.name || ''} ${p.provider || p.id || ''}`);
+          const names = Array.from(new Set(active.map(p => maskEmails(String(p.name || p.provider || p.id || '')))));
+
+          logItem('Conexões de provedores', `${list.length} (${active.length} ativas)`);
+          logInfo(`Ativas: ${names.join(', ')}`);
+
+          if (active.length < 3) {
             issues.push({
               type: 'warn',
-              message: line.trim(),
-              fix: 'omniroute doctor'
+              message: 'Menos de 3 provedores ativos: conecte mais para ter fallback',
             });
+          } else {
+            logSuccess('Você tem uma boa quantidade de provedores conectados!');
           }
-        });
-      } catch (error: any) {
-        logWarn('⚠️ Não foi possível executar omniroute doctor');
+
+          if (!connectedIds.some(p => /anthropic|deepseek/i.test(p))) {
+            logInfo('Considere um provedor pago (como o DeepSeek) só como última reserva');
+          }
+
+          const missing = getMissingFreeProviders(connectedIds);
+          if (missing.length > 0) {
+            const shown = missing.slice(0, 3).map(p => p.displayName).join(', ');
+            const more = missing.length > 3 ? ` e mais ${missing.length - 3}` : '';
+            logInfo(`Provedores gratuitos que você ainda não conectou: ${shown}${more}`);
+            suggestions.push(`Veja como conectar os que faltam: easy-o-route providers --add ${missing[0].name}`);
+          } else {
+            logSuccess('Todos os provedores gratuitos que o Easy-O-Route conhece estão conectados!');
+          }
+        } else {
+          logWarn('Nenhum provedor conectado');
+          logInfo(`Conecte provedores no painel: ${OMNIROUTE.LOCAL_URL}`);
+          suggestions.push('Comece por: easy-o-route providers --setup-guide');
+        }
+      } catch {
+        logWarn('Não foi possível listar provedores (verifique se o OmniRoute está rodando)');
       }
 
-      // Display issues
-      logSection('📋 Resumo da Verificação');
-      
-      const errors = issues.filter(i => i.type === 'error');
-      const warns = issues.filter(i => i.type === 'warn');
-      
-      if (errors.length > 0) {
-        logList(errors.map(i => `❌ ERRO: ${i.message}`), `❌ ERROS (${errors.length})`);
-      }
-      
-      if (warns.length > 0) {
-        logList(warns.map(i => `⚠️ AVISO: ${i.message}`), `⚠️ AVISOS (${warns.length})`);
-      }
-      
-      if (suggestions.length > 0) {
-        logList(suggestions, '💡 SUGESTÕES');
-      }
-      
-      if (errors.length === 0 && warns.length === 0 && suggestions.length === 0) {
-        logSuccess('✅ Tudo está perfeito! Nenhum problema encontrado.');
+      // 5. Combos
+      logSection('5. Verificando Combos');
+
+      try {
+        const apiKey = findApiKey(options.apiKey);
+        let combos: ComboLike[] = [];
+        let contexts: Record<string, number> = {};
+        let contextChecked = false;
+
+        if (apiKey && serverUp) {
+          try {
+            const combosData = await apiGet<{ combos?: ComboLike[] } | ComboLike[]>('/api/combos', apiKey);
+            combos = Array.isArray(combosData) ? combosData : combosData.combos || [];
+            const modelsData = await apiGet<{ data?: Array<{ id: string; context_length?: number }> }>(
+              '/v1/models',
+              apiKey
+            );
+            contexts = {};
+            for (const m of modelsData.data || []) {
+              if (m.context_length) contexts[m.id] = m.context_length;
+            }
+            contextChecked = true;
+          } catch {
+            logInfo('Não foi possível ler os combos pela API; usando a lista do terminal');
+          }
+        }
+
+        if (combos.length === 0) {
+          const result = spawnSync('omniroute combo list --json', {
+            encoding: 'utf8',
+            stdio: ['ignore', 'pipe', 'ignore'],
+            shell: true,
+            timeout: 60000,
+          });
+          const data = extractJson(result.stdout || '') as { combos?: ComboLike[] } | ComboLike[] | null;
+          combos = Array.isArray(data) ? data : data?.combos || [];
+        }
+
+        if (combos.length > 0) {
+          logItem('Combos configurados', `${combos.length} combos`);
+          combos.forEach(combo => {
+            const steps = (combo.models || []).length;
+            logInfo(`- ${combo.name || combo.id}: ${steps} passos`);
+          });
+
+          const hasEconomico = combos.some(c => (c.name || c.id || '').toLowerCase().includes('economico'));
+          if (!hasEconomico) {
+            suggestions.push(
+              `Crie um combo "${SUGGESTED_ECONOMIC_COMBO.name}" (gratuitos na frente): ${OMNIROUTE.LOCAL_URL} → Combinações → Criar Combo`
+            );
+          } else {
+            logSuccess('Você já tem combos configurados!');
+          }
+
+          if (contextChecked) {
+            const problems = analyzeComboContext(combos, contexts, MIN_COMBO_CONTEXT);
+            if (problems.length === 0) {
+              logSuccess(`Todos os passos dos combos aceitam ${formatTokens(MIN_COMBO_CONTEXT)} tokens ou mais`);
+            }
+            for (const p of problems) {
+              const detail = p.smallSteps.map(s => `${s.model} (${formatTokens(s.context)})`).join(', ');
+              issues.push({
+                type: 'warn',
+                message:
+                  `Combo "${p.combo}": contexto pequeno em ${p.smallSteps.length} passo(s): ${detail}. ` +
+                  `No OmniRoute 3.8.54, o limite do combo é o do menor passo (${formatTokens(p.minContext)}): ` +
+                  'pedidos maiores falham em todos os passos ("Context limit reached" no Claude Code). ' +
+                  `Retire esses passos ou troque por modelos de ${formatTokens(MIN_COMBO_CONTEXT)} tokens ou mais.`,
+              });
+            }
+          } else {
+            logInfo('Para checar o contexto dos passos, defina OMNIROUTE_API_KEY ou use --api-key');
+          }
+        } else {
+          logWarn('Nenhum combo configurado');
+          logInfo(`Crie um combo no painel: ${OMNIROUTE.LOCAL_URL}`);
+          suggestions.push(COMBO_TIPS[0]);
+        }
+      } catch {
+        logWarn('Não foi possível listar combos (verifique se o OmniRoute está rodando)');
       }
 
-      // Fix issues if requested
-      if (options.fix && issues.length > 0) {
-        logSection('🔧 Tentando corrigir problemas...');
-        
-        for (const issue of issues) {
-          if (issue.fix) {
-            logInfo(`Corrigindo: ${issue.message}`);
-            try {
-              execSync(issue.fix, { stdio: 'inherit' });
-              logSuccess(`✅ Corrigido: ${issue.message}`);
-            } catch (fixError: any) {
-              logError(`❌ Falha ao corrigir: ${issue.message} - ${fixError.message}`);
+      // 6. Início automático
+      logSection('6. Verificando Início Automático');
+
+      try {
+        const autostartStatus = runCapture('omniroute autostart status');
+        if (/\|\s*true\s*\|/.test(autostartStatus) || (/enabled/i.test(autostartStatus) && !/disabled/i.test(autostartStatus))) {
+          const mechanism = /\|\s*true\s*\|\s*([\w-]+)/.exec(autostartStatus);
+          logSuccess(`Início automático ativado${mechanism ? ` (${mechanism[1]})` : ''}`);
+        } else if (/false|disabled/i.test(autostartStatus)) {
+          issues.push({
+            type: 'warn',
+            message: 'Início automático desativado',
+            fix: 'omniroute autostart enable',
+          });
+        } else {
+          logWarn('Não foi possível interpretar o estado do início automático');
+        }
+      } catch {
+        logWarn('Não foi possível verificar início automático');
+      }
+
+      // 7. Doctor
+      logSection('7. Executando omniroute doctor');
+
+      try {
+        const doctorOutput = runCapture('omniroute doctor');
+        if (options.verbose) {
+          logInfo('--- Saída completa do omniroute doctor ---');
+          console.log(maskEmails(doctorOutput));
+          logInfo('------------------------------------------');
+        }
+
+        const toolsNotLinked: string[] = [];
+        for (const raw of doctorOutput.split(/\r?\n/)) {
+          const line = raw.trim();
+          if (/^(ERROR|FAIL)/.test(line)) {
+            issues.push({ type: 'error', message: line });
+          } else if (/^WARN/.test(line)) {
+            const cli = /^WARN CLI:\s*([^:]+):\s*(.*)$/.exec(line);
+            if (cli) {
+              // Ferramenta de IA que o usuário não instalou não é problema
+              if (/not installed/i.test(cli[2])) continue;
+              if (/not configured/i.test(cli[2])) {
+                toolsNotLinked.push(cli[1].trim());
+                continue;
+              }
+              issues.push({ type: 'warn', message: line });
+            } else if (/Port availability/i.test(line) && serverUp) {
+              // Porta em uso é o esperado quando o próprio OmniRoute está rodando
+              continue;
+            } else if (/Server liveness|CLI machine token/i.test(line) && serverUp) {
+              // Falha momentânea (por exemplo, logo depois de iniciar): o servidor já responde
+              continue;
+            } else {
+              issues.push({ type: 'warn', message: line });
             }
           }
         }
+
+        const summary = /Summary:\s*(\d+) ok,\s*(\d+) warning\(s\),\s*(\d+) failure\(s\)/i.exec(doctorOutput);
+        if (summary) {
+          logInfo(`Resultado do doctor: ${summary[1]} ok, ${summary[2]} avisos, ${summary[3]} falhas (avisos sobre ferramentas não instaladas são ignorados aqui)`);
+        }
+        if (toolsNotLinked.length > 0) {
+          logInfo(
+            `ℹ️ Ferramentas reconhecidas e ainda não ligadas ao OmniRoute: ${toolsNotLinked.join(', ')}. ` +
+              'Se você usa atalhos como claude-eco, isso é normal.'
+          );
+        }
+      } catch {
+        logWarn('Não foi possível executar omniroute doctor');
+      }
+
+      // Resumo
+      logSection('📋 Resumo da Verificação');
+
+      const errors = issues.filter(i => i.type === 'error');
+      const warns = issues.filter(i => i.type === 'warn');
+
+      if (errors.length > 0) {
+        logList(errors.map(i => `❌ ERRO: ${i.message}`), `❌ ERROS (${errors.length})`);
+      }
+
+      if (warns.length > 0) {
+        logList(warns.map(i => `⚠️ AVISO: ${i.message}`), `⚠️ AVISOS (${warns.length})`);
+      }
+
+      if (suggestions.length > 0) {
+        logList(suggestions.map(s => `💡 ${s}`), '💡 SUGESTÕES');
+      }
+
+      if (errors.length === 0 && warns.length === 0) {
+        logSuccess('Tudo certo! Nenhum problema encontrado.');
+      }
+
+      // Corrige o que tem comando de correção
+      const fixable = issues.filter(i => i.fix);
+      if (options.fix && fixable.length > 0) {
+        logSection('🔧 Tentando corrigir problemas...');
+
+        for (const issue of fixable) {
+          logInfo(`Corrigindo: ${issue.message}`);
+          try {
+            execSync(issue.fix as string, { stdio: 'inherit' });
+            logSuccess(`Corrigido: ${issue.message}`);
+          } catch (fixError: unknown) {
+            const message = fixError instanceof Error ? fixError.message : String(fixError);
+            logError(`Falha ao corrigir: ${issue.message} - ${message}`);
+          }
+        }
+      } else if (fixable.length > 0) {
+        logInfo(`${fixable.length} problema(s) têm correção automática: rode easy-o-route check --fix`);
       }
 
       logSection('✅ Verificação Concluída');
-      
-    } catch (error: any) {
-      logError(`❌ Erro ao verificar configuração: ${error.message}`);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      logError(`Erro ao verificar configuração: ${message}`);
       process.exit(1);
     }
   });

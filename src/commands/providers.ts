@@ -15,8 +15,10 @@ import {
   SUGGESTED_ECONOMIC_COMBO,
   getMissingFreeProviders,
   getQuickSetupGuide,
+  COMBO_TIPS,
   FreeProvider,
 } from '../utils/freeProviders';
+import { extractJson, maskEmails } from '../utils/omniroute';
 
 export const providersCommand = new Command('providers')
   .description('Gerenciar e sugerir provedores de IA (gratuito/pago)')
@@ -42,14 +44,15 @@ export const providersCommand = new Command('providers')
 
       if (options.add) {
         // Mostrar instruções para provedor específico
+        const wanted = String(options.add).toLowerCase();
         const provider = FREE_PROVIDERS.find(
-          p => p.name.toLowerCase() === options.add.toLowerCase()
+          p => p.name.toLowerCase() === wanted || p.aliases.some(a => a.toLowerCase() === wanted)
         );
         
         if (provider) {
           showProviderInstructions(provider);
         } else {
-          logError(`❌ Provedor "${options.add}" não encontrado na lista de provedores conhecidos`);
+          logError(`Provedor "${options.add}" não encontrado na lista de provedores conhecidos`);
           logInfo('Use --list-all para ver todos os provedores disponíveis');
           logInfo('ou --recommended para ver os recomendados');
         }
@@ -69,7 +72,7 @@ export const providersCommand = new Command('providers')
       }
 
     } catch (error: any) {
-      logError(`❌ Erro: ${error.message}`);
+      logError(`Erro: ${error.message}`);
       process.exit(1);
     }
   });
@@ -158,9 +161,10 @@ function listFreeProviders(): void {
   
   logSection('💡 DICAS');
   logInfo('1. Comece com provedores de "Dificuldade: Fácil"');
-  logInfo('2. Groq, Mistral e OpenRouter são excelentes para começar');
-  logInfo('3. Todos requerem API Key (gratuita)');
+  logInfo('2. Mistral, Gemini e OpenRouter são ótimos para começar; NVIDIA e Cloudflare pedem um pouco mais de configuração');
+  logInfo('3. Todos pedem uma chave de API (gratuita): cole só no painel do OmniRoute');
   logInfo('4. Configure no painel: http://localhost:20128');
+  logInfo('5. Cotas e limites gratuitos mudam: confira sempre no site de cada provedor');
 }
 
 // Listar provedores recomendados
@@ -176,24 +180,24 @@ function listRecommendedProviders(): void {
   recommended.forEach((provider, index) => {
     logItem(`${index + 1}. ${provider.displayName}`, provider.description);
     logInfo(`   🔗 ${provider.docsUrl}`);
-    logInfo(`   📝 Variável: ${provider.apiKeyEnv}`);
     logInfo(`   🤖 Modelos populares: ${provider.models.slice(0, 2).join(', ')}`);
     logInfo('');
   });
-  
+
   logSection('🎯 POR QUE ESTES?');
-  logInfo('✅ Groq: Ultra rápido, bons modelos gratuitos');
-  logInfo('✅ Mistral: Excelente custo-benefício');
-  logInfo('✅ OpenRouter: Acesso a múltiplos provedores');
-  logInfo('✅ Together: Centenas de modelos de código aberto');
-  logInfo('✅ Fireworks: Modelos otimizados');
-  
+  logInfo('Mistral: rápido e bom em código');
+  logInfo('NVIDIA NIM: modelos gigantes gratuitos (podem ser lentos)');
+  logInfo('Gemini: textos longos, com cota diária gratuita');
+  logInfo('Groq: muito rápido, mas recusa pedidos grandes (deixe no fim da fila)');
+  logInfo('Cloudflare: reserva gratuita (confira o contexto de cada modelo)');
+  logInfo('OpenRouter: variedade de modelos :free, com limite diário baixo');
+
   logSection('💡 COMO CONFIGURAR');
-  logInfo('1. Crie conta em cada provedor');
-  logInfo('2. Obtenha sua API Key');
-  logInfo('3. Adicione no OmniRoute: http://localhost:20128');
-  logInfo('4. Configure os modelos sugeridos');
-  logInfo('5. Teste a conexão');
+  logInfo('1. Crie conta em cada provedor (digite o endereço no navegador)');
+  logInfo('2. Gere a chave de API');
+  logInfo('3. Cole a chave no OmniRoute: http://localhost:20128 → Provedores → Adicionar');
+  logInfo('4. Teste a conexão (botão Test ou: omniroute providers test-all)');
+  logInfo('5. Monte o combo com gratuitos na frente e pagos por último');
 }
 
 // Mostrar instruções para um provedor específico
@@ -222,33 +226,33 @@ function showProviderInstructions(provider: FreeProvider): void {
   logSection('✅ PASSO A PASSO');
   
   const steps = [
-    `1. Acesse ${provider.docsUrl}`,
+    `1. Acesse ${provider.docsUrl} (digite o endereço no navegador)`,
     '2. Crie uma conta (se não tiver)',
-    '3. Obtenha sua API Key',
+    '3. Gere a chave de API e copie (ela costuma aparecer uma única vez)',
     `4. Configure no OmniRoute (http://localhost:20128):`,
-    `   - Acesse: Settings → Providers → Add Provider`,
-    `   - Name: ${provider.displayName}`,
-    `   - Base URL: ${provider.baseUrl}`,
-    `   - API Key: ${provider.apiKeyEnv || 'sua-chave-api'}`,
+    `   - Acesse: Provedores → Adicionar`,
+    `   - Escolha o provedor: ${provider.displayName}`,
+    `   - Base URL (se o painel pedir): ${provider.baseUrl}`,
+    '   - Cole a chave de API só nesse campo (nunca em chats ou prints)',
     '5. Salve e teste a conexão',
-    `6. Adicione os modelos: ${provider.models.slice(0, 3).join(', ')}`,
+    `6. Modelos para o combo: ${provider.models.slice(0, 3).join(', ')} (confira o contexto: 100 mil tokens ou mais)`,
   ];
   
   steps.forEach(step => logInfo(step));
   
   logSection('💡 DICAS');
   if (provider.difficulty === 'easy') {
-    logSuccess('✅ Este provedor é fácil de configurar!');
+    logSuccess('Este provedor é fácil de configurar!');
   } else if (provider.difficulty === 'medium') {
-    logWarn('⚠️ Este provedor pode requerer configuração adicional');
+    logWarn('Este provedor pode requerer configuração adicional');
   } else {
-    logError('❌ Este provedor requer configuração avançada');
+    logError('Este provedor requer configuração avançada');
   }
   
   if (provider.isFree) {
-    logSuccess('✅ Gratuito!');
+    logSuccess('Gratuito!');
   } else {
-    logWarn('⚠️ Requer plano pago');
+    logWarn('Requer plano pago');
   }
   
   logSuccess('\n✅ Pronto! Agora você pode usar este provedor no OmniRoute');
@@ -262,21 +266,31 @@ async function checkConnectedProviders(): Promise<void> {
   
   try {
     const providersOutput = execSync('omniroute providers list --json 2>&1').toString();
-    const providers = JSON.parse(providersOutput);
-    connectedProviders = providers.map((p: any) => p.name || p.id);
-    
-    if (connectedProviders.length > 0) {
+    const data = extractJson(providersOutput) as
+      | { providers?: unknown[]; connections?: unknown[] }
+      | unknown[]
+      | null;
+    const list = (Array.isArray(data) ? data : data?.providers || data?.connections || []) as Array<
+      Record<string, unknown>
+    >;
+    const active = list.filter(p => p.isActive !== false && p.active !== false);
+    // nome + id, para reconhecer provedores como "Cloudflare" (id cloudflare-ai)
+    connectedProviders = active.map(p => `${p.name || ''} ${p.provider || p.id || ''}`);
+
+    if (active.length > 0) {
       logSection('✅ PROVEDORES CONECTADOS');
-      connectedProviders.forEach(p => logSuccess(`  ✓ ${p}`));
+      Array.from(new Set(active.map(p => maskEmails(String(p.name || p.provider || p.id || ''))))).forEach(n =>
+        logSuccess(`  ✓ ${n}`)
+      );
       logInfo('');
     }
   } catch (error: any) {
     const errorStr = error.message || '';
     if (errorStr.includes('401') || errorStr.includes('403') || errorStr.includes('Unauthorized')) {
-      logWarn('⚠️ OmniRoute requer autenticação para listar provedores');
+      logWarn('OmniRoute requer autenticação para listar provedores');
       logInfo('   Configure sua senha no painel: http://localhost:20128');
     } else {
-      logWarn('⚠️ Não foi possível listar provedores conectados');
+      logWarn('Não foi possível listar provedores conectados');
       logInfo('   Verifique se o OmniRoute está rodando: omniroute status');
     }
   }
@@ -328,18 +342,16 @@ async function checkConnectedProviders(): Promise<void> {
   logInfo(` Combo "${SUGGESTED_ECONOMIC_COMBO.name}": ${SUGGESTED_ECONOMIC_COMBO.description}`);
   
   if (connectedProviders.length >= 3) {
-    logSuccess('✅ Você tem provedores suficientes para criar um combo');
+    logSuccess('Você tem provedores suficientes para criar um combo');
     logInfo('   Acesse: http://localhost:20128 → Combos → Novo Combo');
   } else {
-    logWarn('⚠️ Recomendamos ter pelo menos 3 provedores para um bom combo');
+    logWarn('Recomendamos ter pelo menos 3 provedores para um bom combo');
     logInfo('   Adicione mais provedores gratuitos antes de criar o combo');
   }
   
   logInfo('');
   logInfo('📊 Dicas para combos:');
-  logInfo('   - Coloque provedores gratuitos na frente');
-  logInfo('   - Use provedores rápidos (Groq) para testes');
-  logInfo('   - Deixe provedores pagos como última reserva');
+  COMBO_TIPS.forEach(tip => logInfo(`   - ${tip}`));
   
   logSuccess('\n✅ Verificação concluída!');
 }
@@ -375,17 +387,16 @@ async function showSetupGuide(): Promise<void> {
   logInfo('Descrição: Provedores gratuitos para economia');
   logInfo('');
   logInfo('Provedores (na ordem):');
-  logInfo('  1. Groq (llama-3.1-8b-instant)');
-  logInfo('  2. Mistral (mistral-tiny)');
-  logInfo('  3. OpenRouter (openai/gpt-3.5-turbo)');
-  logInfo('  4. Together (meta-llama/Llama-3.1-8B-Instruct)');
+  SUGGESTED_ECONOMIC_COMBO.providers.forEach((p, i) => {
+    logInfo(`  ${i + 1}. ${p.name} (${p.models[0]})`);
+  });
   logInfo('');
-  logInfo('💡 Dica: A ordem importa! O OmniRoute usa na sequência.');
-  
+  logInfo('💡 Dica: a ordem importa! O OmniRoute tenta um de cada vez, de cima para baixo.');
+
   logSection('🔗 RECURSOS ÚTEIS');
-  logInfo('Documentação do OmniRoute: https://github.com/cheaper-inference/OmniRoute');
+  logInfo('Documentação do OmniRoute: https://github.com/diegosouzapw/OmniRoute');
   logInfo('Easy-O-Route: https://github.com/ferpa2505-art/Easy-O-Route');
   logInfo('');
   
-  logSuccess('✅ Pronto! Siga estes passos e você terá um setup otimizado!');
+  logSuccess('Pronto! Siga estes passos e você terá um setup otimizado!');
 }
