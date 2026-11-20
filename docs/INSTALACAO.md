@@ -120,7 +120,7 @@ npm install -g omniroute
 
 # Check version
 omniroute --version
-# Should show: 3.8.53 or higher
+# Should show: 3.8.54 or higher
 ```
 
 #### If there's an error with npm 11+:

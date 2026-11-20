@@ -1,5 +1,6 @@
-// Lista de provedores gratuitos de IA conhecidos
-// com suas configurações padrão para o OmniRoute
+// Provedores de IA conhecidos pelo Easy-O-Route, com as configurações usadas no OmniRoute.
+// Lista conferida em outubro/novembro de 2026 (os mesmos provedores do livro "IA Barata de Verdade").
+// Cotas e planos gratuitos mudam: confirme sempre no site de cada provedor.
 
 export interface FreeProvider {
   name: string;
@@ -13,6 +14,8 @@ export interface FreeProvider {
   category: 'text' | 'image' | 'embedding' | 'audio';
   difficulty: 'easy' | 'medium' | 'hard';
   docsUrl: string;
+  /** Pedaços de texto que identificam este provedor entre as conexões do OmniRoute. */
+  aliases: string[];
 }
 
 export interface ProviderSuggestion {
@@ -22,59 +25,7 @@ export interface ProviderSuggestion {
   recommendations: string[];
 }
 
-// Provedores gratuitos populares
 export const FREE_PROVIDERS: FreeProvider[] = [
-  {
-    name: 'openai',
-    displayName: 'OpenAI (Free Tier)',
-    baseUrl: 'https://api.openai.com/v1',
-    apiKeyEnv: 'OPENAI_API_KEY',
-    isFree: true,
-    requiresApiKey: true,
-    models: [
-      'gpt-3.5-turbo',
-      'gpt-3.5-turbo-16k',
-      'gpt-4o-mini',
-    ],
-    description: 'OpenAI oferece créditos gratuitos para novos usuários',
-    category: 'text',
-    difficulty: 'easy',
-    docsUrl: 'https://platform.openai.com/docs/api-reference',
-  },
-  {
-    name: 'anthropic',
-    displayName: 'Anthropic (Free Tier)',
-    baseUrl: 'https://api.anthropic.com/v1',
-    apiKeyEnv: 'ANTHROPIC_API_KEY',
-    isFree: true,
-    requiresApiKey: true,
-    models: [
-      'claude-3-haiku-20240307',
-      'claude-3-5-sonnet-20240620',
-    ],
-    description: 'Claude 3 Haiku e Sonnet têm uso gratuito limitado',
-    category: 'text',
-    difficulty: 'easy',
-    docsUrl: 'https://docs.anthropic.com/en/docs',
-  },
-  {
-    name: 'groq',
-    displayName: 'Groq',
-    baseUrl: 'https://api.groq.com/v1',
-    apiKeyEnv: 'GROQ_API_KEY',
-    isFree: true,
-    requiresApiKey: true,
-    models: [
-      'llama-3.1-8b-instant',
-      'llama-3.1-70b-versatile',
-      'mixtral-8x7b-instruct-v0.1',
-      'gemma-7b-it',
-    ],
-    description: 'Alta velocidade, vários modelos gratuitos',
-    category: 'text',
-    difficulty: 'easy',
-    docsUrl: 'https://console.groq.com/docs',
-  },
   {
     name: 'mistral',
     displayName: 'Mistral AI',
@@ -82,129 +33,12 @@ export const FREE_PROVIDERS: FreeProvider[] = [
     apiKeyEnv: 'MISTRAL_API_KEY',
     isFree: true,
     requiresApiKey: true,
-    models: [
-      'mistral-tiny',
-      'mistral-small',
-      'mistral-medium',
-    ],
-    description: 'Modelos de código aberto com bom custo-benefício',
+    models: ['codestral-latest', 'ministral-14b-latest'],
+    description: 'Rápido e bom em código; plano gratuito com limites por minuto',
     category: 'text',
     difficulty: 'easy',
-    docsUrl: 'https://docs.mistral.ai',
-  },
-  {
-    name: 'google',
-    displayName: 'Google Vertex AI',
-    baseUrl: 'https://us-central1-aiplatform.googleapis.com/v1',
-    apiKeyEnv: 'GOOGLE_API_KEY',
-    isFree: true,
-    requiresApiKey: true,
-    models: [
-      'gemini-1.5-flash',
-      'gemini-1.0-pro',
-    ],
-    description: 'Gemini com créditos gratuitos mensais',
-    category: 'text',
-    difficulty: 'medium',
-    docsUrl: 'https://cloud.google.com/vertex-ai',
-  },
-  {
-    name: 'cohere',
-    displayName: 'Cohere',
-    baseUrl: 'https://api.cohere.ai/v1',
-    apiKeyEnv: 'COHERE_API_KEY',
-    isFree: true,
-    requiresApiKey: true,
-    models: [
-      'command-r-plus',
-      'command',
-      'embed-english-v3.0',
-    ],
-    description: 'Modelos para texto e embeddings gratuitos',
-    category: 'text',
-    difficulty: 'easy',
-    docsUrl: 'https://docs.cohere.com',
-  },
-  {
-    name: 'fireworks',
-    displayName: 'Fireworks AI',
-    baseUrl: 'https://api.fireworks.ai/inference/v1',
-    apiKeyEnv: 'FIREWORKS_API_KEY',
-    isFree: true,
-    requiresApiKey: true,
-    models: [
-      'accounts/fireworks/models/llama-v3p1-8b-instruct',
-      'accounts/fireworks/models/mixtral-8x7b-instruct',
-    ],
-    description: 'Modelos de código aberto gratuitos',
-    category: 'text',
-    difficulty: 'medium',
-    docsUrl: 'https://fireworks.ai',
-  },
-  {
-    name: 'together',
-    displayName: 'Together AI',
-    baseUrl: 'https://api.together.xyz/v1',
-    apiKeyEnv: 'TOGETHER_API_KEY',
-    isFree: true,
-    requiresApiKey: true,
-    models: [
-      'meta-llama/Llama-3.1-8B-Instruct',
-      'mistralai/Mistral-7B-Instruct-v0.3',
-      'Qwen/Qwen2-7B-Instruct',
-    ],
-    description: 'Acesso a centenas de modelos de código aberto',
-    category: 'text',
-    difficulty: 'medium',
-    docsUrl: 'https://www.together.ai',
-  },
-  {
-    name: 'litellm',
-    displayName: 'LiteLLM',
-    baseUrl: 'https://api.litellm.ai/v1',
-    apiKeyEnv: 'LITELLM_API_KEY',
-    isFree: false,
-    requiresApiKey: true,
-    models: [],
-    description: 'Proxy para múltiplos provedores (requer configuração)',
-    category: 'text',
-    difficulty: 'hard',
-    docsUrl: 'https://litellm.ai',
-  },
-  {
-    name: 'openrouter',
-    displayName: 'OpenRouter',
-    baseUrl: 'https://openrouter.ai/api/v1',
-    apiKeyEnv: 'OPENROUTER_API_KEY',
-    isFree: true,
-    requiresApiKey: true,
-    models: [
-      'openai/gpt-3.5-turbo',
-      'anthropic/claude-3-haiku',
-      'google/gemini-flash-1.5',
-      'meta-llama/llama-3.1-8b-instruct',
-    ],
-    description: 'Gateway para vários provedores com créditos gratuitos',
-    category: 'text',
-    difficulty: 'easy',
-    docsUrl: 'https://openrouter.ai',
-  },
-  {
-    name: 'perplexity',
-    displayName: 'Perplexity AI',
-    baseUrl: 'https://api.perplexity.ai/v1',
-    apiKeyEnv: 'PERPLEXITY_API_KEY',
-    isFree: true,
-    requiresApiKey: true,
-    models: [
-      'llama-3.1-sonar-large-128k-online',
-      'llama-3.1-sonar-small-128k-online',
-      'mistral-large-online',
-    ],
-    description: 'Modelos com busca online integrada',
-    category: 'text',
-    difficulty: 'easy',
-    docsUrl: 'https://docs.perplexity.ai',
+    docsUrl: 'https://console.mistral.ai',
+    aliases: ['mistral'],
   },
   {
     name: 'nvidia',
@@ -213,100 +47,191 @@ export const FREE_PROVIDERS: FreeProvider[] = [
     apiKeyEnv: 'NVIDIA_API_KEY',
     isFree: true,
     requiresApiKey: true,
-    models: [
-      'meta/llama3.1-8b-instruct',
-      'meta/llama3.1-70b-instruct',
-      'mistralai/mistral-large-2402',
-    ],
-    description: 'Modelos otimizados para NVIDIA',
+    models: ['nvidia/nemotron-3-ultra-550b-a55b', 'minimaxai/minimax-m3.1-flash'],
+    description: 'Inferência gratuita com modelos gigantes (pode ser lenta; a lista automática do painel pode vir desatualizada)',
     category: 'text',
     difficulty: 'medium',
-    docsUrl: 'https://www.nvidia.com/en-us/ai-data-science/foundation-models/',
+    docsUrl: 'https://build.nvidia.com',
+    aliases: ['nvidia'],
   },
   {
-    name: 'huggingface',
-    displayName: 'Hugging Face',
-    baseUrl: 'https://api-inference.huggingface.co/models',
-    apiKeyEnv: 'HUGGINGFACE_API_KEY',
+    name: 'gemini',
+    displayName: 'Google Gemini (AI Studio)',
+    baseUrl: 'https://generativelanguage.googleapis.com/v1beta/openai',
+    apiKeyEnv: 'GEMINI_API_KEY',
     isFree: true,
     requiresApiKey: true,
-    models: [
-      'mistralai/Mistral-7B-Instruct-v0.3',
-      'Qwen/Qwen2-7B-Instruct',
-      'google/flan-t5-xxl',
-    ],
-    description: 'Hugging Face Inference API com modelos gratuitos',
+    models: ['gemini-flash-lite-latest', 'gemini-3.6-flash'],
+    description: 'Textos longos (1 milhão de tokens de contexto), com cota diária gratuita',
+    category: 'text',
+    difficulty: 'easy',
+    docsUrl: 'https://aistudio.google.com',
+    aliases: ['gemini'],
+  },
+  {
+    name: 'groq',
+    displayName: 'Groq',
+    baseUrl: 'https://api.groq.com/openai/v1',
+    apiKeyEnv: 'GROQ_API_KEY',
+    isFree: true,
+    requiresApiKey: true,
+    models: ['openai/gpt-oss-120b'],
+    description: 'Muito rápido, mas recusa pedidos grandes (erro 413): deixe no fim da fila',
+    category: 'text',
+    difficulty: 'easy',
+    docsUrl: 'https://console.groq.com',
+    aliases: ['groq'],
+  },
+  {
+    name: 'cloudflare',
+    displayName: 'Cloudflare Workers AI',
+    baseUrl: 'https://api.cloudflare.com/client/v4/accounts/SEU_ACCOUNT_ID/ai/v1',
+    apiKeyEnv: 'CLOUDFLARE_API_TOKEN',
+    isFree: true,
+    requiresApiKey: true,
+    models: ['@cf/zai-org/glm-4.7-flash'],
+    description: 'Reserva gratuita; pede o ID da conta e um token. Atenção: alguns modelos têm só 24 mil tokens de contexto',
     category: 'text',
     difficulty: 'medium',
-    docsUrl: 'https://huggingface.co/inference-api',
+    docsUrl: 'https://dash.cloudflare.com',
+    aliases: ['cloudflare'],
+  },
+  {
+    name: 'openrouter',
+    displayName: 'OpenRouter (modelos :free)',
+    baseUrl: 'https://openrouter.ai/api/v1',
+    apiKeyEnv: 'OPENROUTER_API_KEY',
+    isFree: true,
+    requiresApiKey: true,
+    models: ['nvidia/nemotron-3-ultra-550b-a55b:free'],
+    description: 'Variedade de modelos gratuitos, mas com limite diário baixo',
+    category: 'text',
+    difficulty: 'easy',
+    docsUrl: 'https://openrouter.ai',
+    aliases: ['openrouter'],
+  },
+  {
+    name: 'ollama-cloud',
+    displayName: 'Ollama Cloud',
+    baseUrl: 'https://ollama.com',
+    apiKeyEnv: 'OLLAMA_API_KEY',
+    isFree: true,
+    requiresApiKey: true,
+    models: ['gemma4:31b', 'nemotron-3-super'],
+    description: 'Plano gratuito limitado; alguns modelos exigem plano pago',
+    category: 'text',
+    difficulty: 'medium',
+    docsUrl: 'https://ollama.com',
+    aliases: ['ollama-cloud', 'ollama cloud'],
+  },
+  {
+    name: 'zai',
+    displayName: 'Z.AI (GLM)',
+    baseUrl: 'https://api.z.ai/api/paas/v4',
+    apiKeyEnv: 'ZAI_API_KEY',
+    isFree: true,
+    requiresApiKey: true,
+    models: ['glm-4.7-flash'],
+    description: 'Modelo gratuito, mas instável (erro 529 de sobrecarga em parte das tentativas): deixe perto do fim',
+    category: 'text',
+    difficulty: 'medium',
+    docsUrl: 'https://z.ai',
+    aliases: ['z.ai', 'z. ai', 'zai'],
+  },
+  {
+    name: 'deepseek',
+    displayName: 'DeepSeek (pago)',
+    baseUrl: 'https://api.deepseek.com/v1',
+    apiKeyEnv: 'DEEPSEEK_API_KEY',
+    isFree: false,
+    requiresApiKey: true,
+    models: ['deepseek-v4-pro'],
+    description: 'Raciocínio barato, mas exige saldo na conta: use só como última reserva',
+    category: 'text',
+    difficulty: 'easy',
+    docsUrl: 'https://platform.deepseek.com',
+    aliases: ['deepseek'],
   },
 ];
 
-// Provedores gratuitos recomendados para combo econômico
+// Provedores gratuitos recomendados para começar o combo econômico
 export const RECOMMENDED_FREE_PROVIDERS = [
-  'groq',
   'mistral',
+  'nvidia',
+  'gemini',
+  'groq',
+  'cloudflare',
   'openrouter',
-  'together',
-  'fireworks',
 ];
 
-// Combo econômico sugerido
+// Combo econômico sugerido (gratuitos grandes na frente, Groq por último)
 export const SUGGESTED_ECONOMIC_COMBO = {
   name: 'economico',
   description: 'Combo de provedores gratuitos para economia de tokens',
   providers: [
-    { name: 'groq', models: ['llama-3.1-8b-instant', 'mixtral-8x7b-instruct-v0.1'] },
-    { name: 'mistral', models: ['mistral-tiny', 'mistral-small'] },
-    { name: 'openrouter', models: ['openai/gpt-3.5-turbo', 'anthropic/claude-3-haiku'] },
-    { name: 'together', models: ['meta-llama/Llama-3.1-8B-Instruct'] },
+    { name: 'mistral', models: ['codestral-latest'] },
+    { name: 'gemini', models: ['gemini-flash-lite-latest'] },
+    { name: 'nvidia', models: ['nvidia/nemotron-3-ultra-550b-a55b'] },
+    { name: 'openrouter', models: ['nvidia/nemotron-3-ultra-550b-a55b:free'] },
+    { name: 'groq', models: ['openai/gpt-oss-120b'] },
   ],
 };
 
-// Combo balanceado sugerido (grátis + pagos como fallback)
+// Combo balanceado sugerido (gratuitos primeiro, um pago como última reserva)
 export const SUGGESTED_BALANCED_COMBO = {
   name: 'balanceado',
-  description: 'Combo balanceado com gratuitos primeiro e pagos como fallback',
+  description: 'Combo balanceado com gratuitos primeiro e um pago como última reserva',
   providers: [
-    { name: 'groq', models: ['llama-3.1-8b-instant'] },
-    { name: 'mistral', models: ['mistral-tiny'] },
-    { name: 'openrouter', models: ['openai/gpt-3.5-turbo'] },
-    { name: 'anthropic', models: ['claude-3-haiku-20240307'] },
+    { name: 'mistral', models: ['codestral-latest'] },
+    { name: 'gemini', models: ['gemini-flash-lite-latest'] },
+    { name: 'nvidia', models: ['nvidia/nemotron-3-ultra-550b-a55b'] },
+    { name: 'deepseek', models: ['deepseek-v4-pro'] },
   ],
 };
 
-// Verifica quais provedores gratuitos o usuário já tem
+// Regra de ouro dos combos (a mesma do livro)
+export const COMBO_TIPS = [
+  'Gratuitos na frente e pagos por último: o dinheiro só sai quando todo o resto falha',
+  'Quem aguenta pedidos grandes vem primeiro (o Groq recusa pedidos grandes: deixe no fim)',
+  'Só ponha no combo modelos com contexto de 100 mil tokens ou mais: um único passo pequeno trava o combo inteiro',
+  'Revise o combo a cada duas ou três semanas: modelos gratuitos aparecem e somem',
+];
+
+/** Este provedor aparece entre as conexões do OmniRoute? (compara nome e id, sem diferenciar maiúsculas) */
+export function isProviderConnected(provider: FreeProvider, connected: string[]): boolean {
+  const names = connected.map(c => c.toLowerCase());
+  return provider.aliases.some(alias => names.some(n => n.includes(alias.toLowerCase())));
+}
+
+// Verifica quais provedores gratuitos o usuário ainda não tem
 export function getMissingFreeProviders(connectedProviders: string[]): FreeProvider[] {
-  const connectedProviderNames = connectedProviders.map(p => p.toLowerCase());
   return FREE_PROVIDERS.filter(
-    provider => 
-      !connectedProviderNames.includes(provider.name.toLowerCase()) &&
-      provider.isFree
+    provider => provider.isFree && !isProviderConnected(provider, connectedProviders)
   );
 }
 
 // Gera instruções para conectar um provedor
 export function getProviderConnectionInstructions(provider: FreeProvider): string[] {
   const instructions: string[] = [];
-  
+
   instructions.push(`📌 ${provider.displayName}:`);
   instructions.push(`   Descrição: ${provider.description}`);
-  
+
   if (provider.requiresApiKey) {
-    instructions.push(`   🔑 Chave API: Crie em ${provider.docsUrl}`);
-    instructions.push(`   📝 Adicione a variável de ambiente: ${provider.apiKeyEnv}`);
+    instructions.push(`   🔑 Chave API: crie em ${provider.docsUrl}`);
+    instructions.push('   📝 Cole a chave só no painel do OmniRoute (Provedores → Adicionar)');
   }
-  
+
   instructions.push(`   🌐 Base URL: ${provider.baseUrl}`);
   instructions.push(`   🤖 Modelos sugeridos: ${provider.models.slice(0, 2).join(', ')}`);
   instructions.push(`   📊 Dificuldade: ${provider.difficulty}`);
-  
+
   if (provider.category === 'text') {
-    instructions.push(`   💬 Tipo: Texto (Chat)`);
+    instructions.push('   💬 Tipo: Texto (Chat)');
   } else {
     instructions.push(`   🎨 Tipo: ${provider.category}`);
   }
-  
+
   return instructions;
 }
 
@@ -314,36 +239,36 @@ export function getProviderConnectionInstructions(provider: FreeProvider): strin
 export function getQuickSetupGuide(connectedProviders: string[]): string[] {
   const guide: string[] = [];
   const missingFreeProviders = getMissingFreeProviders(connectedProviders);
-  
+
   guide.push('='.repeat(60));
   guide.push('🚀 GUIA RÁPIDO DE CONFIGURAÇÃO DE PROVEDORES GRATUITOS');
   guide.push('='.repeat(60));
   guide.push('');
-  
+
   if (connectedProviders.length === 0) {
     guide.push('❌ Você não tem nenhum provedor conectado!');
     guide.push('');
     guide.push('📋 Siga estes passos para configurar provedores gratuitos:');
     guide.push('');
-    
+
     // Sugerir os 3 mais fáceis
     const topFreeProviders = FREE_PROVIDERS.filter(p => p.isFree && p.difficulty === 'easy').slice(0, 3);
-    
+
     topFreeProviders.forEach((provider, index) => {
       guide.push(`${index + 1}. ${provider.displayName}`);
       guide.push(`   - Criar conta: ${provider.docsUrl}`);
-      guide.push(`   - Obter API Key`);
-      guide.push(`   - Configurar no OmniRoute: http://localhost:20128`);
+      guide.push('   - Gerar a chave de API');
+      guide.push('   - Colar a chave no OmniRoute: http://localhost:20128 → Provedores');
       guide.push('');
     });
   } else {
     guide.push(`✅ Você já tem ${connectedProviders.length} provedor(es) conectado(s)`);
     guide.push('');
-    
+
     if (missingFreeProviders.length > 0) {
-      guide.push(`💡 Recomendamos adicionar mais ${missingFreeProviders.length} provedor(es) gratuito(s):`);
+      guide.push(`💡 Você ainda pode adicionar ${missingFreeProviders.length} provedor(es) gratuito(s):`);
       guide.push('');
-      
+
       missingFreeProviders.slice(0, 3).forEach((provider, index) => {
         guide.push(`${index + 1}. ${provider.displayName}`);
         guide.push(`   - ${provider.description}`);
@@ -351,32 +276,32 @@ export function getQuickSetupGuide(connectedProviders: string[]): string[] {
         guide.push('');
       });
     } else {
-      guide.push('✅ Parabéns! Você já tem todos os provedores gratuitos recomendados!');
+      guide.push('✅ Parabéns! Você já tem todos os provedores gratuitos que o Easy-O-Route conhece!');
       guide.push('');
     }
   }
-  
+
   // Sugestão de combo
   guide.push('🎯 SUGESTÃO DE COMBO ECONÔMICO:');
   guide.push(`   Nome: ${SUGGESTED_ECONOMIC_COMBO.name}`);
   guide.push(`   Descrição: ${SUGGESTED_ECONOMIC_COMBO.description}`);
-  guide.push('   Provedores: Groq, Mistral, OpenRouter, Together');
-  guide.push('   Acesse: http://localhost:20128 → Combos → Novo Combo');
+  guide.push('   Provedores: Mistral, Gemini, NVIDIA, OpenRouter, Groq (nesta ordem)');
+  guide.push('   Acesse: http://localhost:20128 → Combinações → Criar Combo');
   guide.push('');
-  
+
   guide.push('='.repeat(60));
-  
+
   return guide;
 }
 
 // Gera configurações prontas para copia/cola
 export function getProviderConfigs(providerNames: string[]): string {
   const configs: string[] = [];
-  
-  const providers = FREE_PROVIDERS.filter(p => 
+
+  const providers = FREE_PROVIDERS.filter(p =>
     providerNames.some(name => p.name.toLowerCase() === name.toLowerCase())
   );
-  
+
   providers.forEach(provider => {
     configs.push(`# ${provider.displayName}`);
     configs.push(`# Base URL: ${provider.baseUrl}`);
@@ -384,6 +309,6 @@ export function getProviderConfigs(providerNames: string[]): string {
     configs.push(`# Modelos: ${provider.models.join(', ')}`);
     configs.push('');
   });
-  
+
   return configs.join('\n');
 }

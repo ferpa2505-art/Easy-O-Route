@@ -30,7 +30,7 @@ A tela de **Início** (Home) é a primeira que você vê depois de entrar.
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│  OMNIROUTE 3.8.53                          [Logado como: você] │
+│  OMNIROUTE 3.8.54                          [Logado como: você] │
 ├───────────────────┬─────────────────────────────────────────┤
 │                   │                                         │
 │  1. MENU LATERAL  │  2. INÍCIO RÁPIDO                       │
