@@ -3,7 +3,7 @@
 # Easy-O-Route Setup Script
 # Facilitador de Configuracao do OmniRoute
 # Autor: Fernando Paulino (ferpa2505-art)
-# Versao: 1.0.1
+# Versao: 1.1.0
 
 set -e
 

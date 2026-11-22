@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-11-22
+
 ### Added
 
 - `easy-o-route panel`: a live topology panel for OmniRoute (providers, requests, connection state) with an English/Portuguese switch, three themes, minimizable panels and animated pipes. Providers added or removed in OmniRoute appear and disappear on their own.
@@ -47,6 +49,8 @@ Initial release of **Easy-O-Route** with:
 - Combo creation and testing.
 - Documentation in Portuguese.
 
+[Unreleased]: https://github.com/ferpa2505-art/Easy-O-Route/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/ferpa2505-art/Easy-O-Route/compare/v1.0.1...v1.1.0
 [1.0.1]: https://github.com/ferpa2505-art/Easy-O-Route/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/ferpa2505-art/Easy-O-Route/releases/tag/v1.0.0
 
