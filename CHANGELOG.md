@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - "How to fix an error": click a failed request (or the button in the Connect OmniRoute panel) to see the likely cause, step-by-step fixes and a web-search button.
 - `panel/start.sh` and `panel/start.ps1` to run the panel with only Node.js installed; they ask for the OmniRoute token with hidden input and keep it in memory only.
 
+### Removed
+
+- The old standalone dashboard in `docs/` (`dashboard.html`, `servidor.js`, `servidor.py`, `iniciar.bat`, `config.json`). It is replaced by `easy-o-route panel`. Its `config.json` stored a `token` field in the repository.
+
 ### Security
 
 - The panel server listens on `127.0.0.1`, only answers to `localhost` Host headers and forwards only `GET` requests to a fixed list of read-only OmniRoute routes. The token is never written to disk.
