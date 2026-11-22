@@ -5,6 +5,18 @@ All notable changes to **Easy-O-Route** will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- `easy-o-route panel`: a live topology panel for OmniRoute (providers, requests, connection state) with an English/Portuguese switch, three themes, minimizable panels and animated pipes. Providers added or removed in OmniRoute appear and disappear on their own.
+- "How to fix an error": click a failed request (or the button in the Connect OmniRoute panel) to see the likely cause, step-by-step fixes and a web-search button.
+- `panel/start.sh` and `panel/start.ps1` to run the panel with only Node.js installed; they ask for the OmniRoute token with hidden input and keep it in memory only.
+
+### Security
+
+- The panel server listens on `127.0.0.1`, only answers to `localhost` Host headers and forwards only `GET` requests to a fixed list of read-only OmniRoute routes. The token is never written to disk.
+
 ## [1.0.1] - 2026-11-18
 
 ### Added

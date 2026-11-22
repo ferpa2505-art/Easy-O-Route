@@ -92,6 +92,9 @@ easy-o-route check
 # 3. See which free providers are available and how to add them
 easy-o-route providers --recommended
 easy-o-route providers --setup-guide
+
+# 4. Watch your providers and requests live in the topology panel
+easy-o-route panel
 ```
 
 ---
@@ -106,6 +109,7 @@ Commands:
   status      Show OmniRoute status
   check       Check the OmniRoute setup and suggest improvements
   providers   List, check and suggest AI providers (free and paid)
+  panel       Start the live topology panel (providers, requests, errors)
   version     Show the Easy-O-Route version
   help        Display help
 
@@ -150,6 +154,48 @@ easy-o-route providers --setup-guide   # Quick setup guide, including a suggeste
 easy-o-route providers --check         # Check connected providers and suggest improvements
 easy-o-route providers --add groq      # Instructions for adding one provider
 ```
+
+---
+
+## Topology panel
+
+A live, bilingual (English / Portuguese) view of your OmniRoute: every active provider, the requests flowing through it and the connection state. New providers appear on their own when you add them in OmniRoute.
+
+```bash
+easy-o-route panel                      # opens http://localhost:8090
+easy-o-route panel --port 9000 --omni-url http://localhost:20128
+```
+
+No CLI installed? Download the repository and run `panel/start.sh` (Linux/macOS) or `panel\start.ps1` (Windows). Only Node.js is needed.
+
+### Connect it to OmniRoute (one time)
+
+1. In OmniRoute, open the left side menu → **Settings → Access token → Create token**.
+   Name: `Easy-o-Route` · Permission: **Administration – Manage** · Expiration: optional.
+2. Copy the token (`oma_live_…`). It is shown only once.
+3. Paste it in the panel (**Connect OmniRoute** → Token → **Connect**), or type it when the command asks, or set the `OMNIROUTE_TOKEN` environment variable.
+
+The button in the footer tells you where you are: **red** = no access to OmniRoute, **amber** = OmniRoute answers but needs the token, **green** = connected and validated.
+
+### What you get
+
+- Providers and requests read from OmniRoute every 4 seconds; providers added or removed in OmniRoute show up or disappear automatically.
+- Animated pipes between OmniRoute and each provider (request out, response back) and a tag with the model used.
+- **When something fails**, click the failed request (or **How to fix an error**) to see the likely cause, step-by-step fixes and a button to search the web for a solution.
+- Minimize the System and Requests panels to the footer, switch language (PT / EN) and theme (dark / medium / light).
+
+### Security
+
+- The panel listens on `127.0.0.1` only, answers only to `localhost` Host headers, and forwards only `GET` requests to a fixed list of read-only OmniRoute routes.
+- The token is never written to disk. It lives in the environment of the panel process or in the browser page you pasted it into.
+- Do not paste tokens or API keys in chats or issues. If one leaks, revoke it in OmniRoute and create a new one.
+
+| Option | Meaning | Default |
+|---|---|---|
+| `-p, --port <port>` | Port of the panel | `8090` |
+| `--omni-url <url>` | OmniRoute address | `http://localhost:20128` |
+| `--no-open` | Do not open the browser | |
+| `--no-token-prompt` | Do not ask for the token | |
 
 ---
 
@@ -199,8 +245,9 @@ The guides are currently in Portuguese:
 ```
 src/
   index.ts              CLI entry point
-  commands/             setup, status, check, providers, version
+  commands/             setup, status, check, providers, version, panel
   utils/                config, constants, logger, free-provider catalog
+panel/                  topology panel: server.js, public/ (web page), start.sh, start.ps1
 scripts/                setup.sh and start.sh (Bash, no Node.js needed)
 docs/                   user guides (Portuguese)
 .github/workflows/      CI: build, lint and publish
