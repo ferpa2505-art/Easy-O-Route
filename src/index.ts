@@ -10,6 +10,7 @@ import { checkCommand } from './commands/check';
 import { providersCommand } from './commands/providers';
 import { updateCommand } from './commands/update';
 import { autoupdateCommand } from './commands/autoupdate';
+import { panelCommand } from './commands/panel';
 import { logError } from './utils/logger';
 import { EASY_OROUTE } from './utils/constants';
 
@@ -45,6 +46,7 @@ export const main = () => {
   program.addCommand(providersCommand);
   program.addCommand(updateCommand);
   program.addCommand(autoupdateCommand);
+  program.addCommand(panelCommand);
 
   // Help command
   program
