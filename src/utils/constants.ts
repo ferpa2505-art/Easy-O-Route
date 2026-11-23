@@ -13,7 +13,7 @@ export const OMNIROUTE = {
 // Easy-O-Route constants
 export const EASY_OROUTE = {
   NAME: 'Easy-O-Route',
-  VERSION: '1.0.1',
+  VERSION: '1.1.0',
   DESCRIPTION: 'Facilitador de Configuracao do OmniRoute',
   AUTHOR: 'Fernando Paulino (ferpa2505-art)',
   REPOSITORY: 'https://github.com/ferpa2505-art/Easy-O-Route',
